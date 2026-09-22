@@ -78,6 +78,9 @@ satu warna aksen (indigo) yang restrained, warna hanya untuk status yang bermakn
 | Fitur | Status |
 |---|---|
 | Login/logout + sesi (tahan refresh) | ✅ |
+| **Registrasi akun (self sign-up)** | ✅ |
+| **Realtime — auto-refresh + indikator "Live · Ns ago"** | ✅ |
+| **Landing page profesional (publik di `/`)** | ✅ |
 | Role ADMIN/OPERATOR/REVIEWER (server-side) | ✅ |
 | Overview "apa yang perlu ditindak" (query nyata) | ✅ |
 | Attention queue (severity dari kondisi nyata) | ✅ |
@@ -97,8 +100,26 @@ satu warna aksen (indigo) yang restrained, warna hanya untuk status yang bermakn
 
 ---
 
-## 6. Data Seed (fiktif)
+## 5b. Landing Page, Registrasi & Realtime
 
+**Landing page (`/`)** — halaman publik profesional yang menjelaskan produk:
+hero, problem (before/with), features, showcase verification engine, how it works,
+roles, CTA, footer. Aplikasi utama ada di `/app`, jadi pengunjung bisa melihat
+gambaran dulu sebelum masuk.
+
+**Registrasi (`/register`)** — pengguna bisa membuat akun sendiri (nama, email,
+password + konfirmasi, pilih role Operator/Reviewer). Akun **tidak bisa**
+menunjuk dirinya sebagai ADMIN — hanya admin yang boleh memberikan role itu.
+Setelah daftar, langsung login otomatis.
+
+**Realtime** — DOCFLOW tidak memakai websocket, tapi data yang paling sering berubah
+(overview, verification queue, activity) di-*poll* berkala lewat React Query.
+Indikator di topbar menunjukkan **"Live · Ns ago"** yang benar-benar menghitung
+waktu sejak refresh terakhir, dan bisa diklik untuk refresh manual.
+
+---
+
+## 6. Data Seed (fiktif)
 - 24 customer fiktif, 59 transaksi, 59 invoice, 65 payment, 26 delivery, 112 dokumen.
 - **7 skenario sengaja dibuat** untuk menunjukkan verifikasi & attention:
 
@@ -123,6 +144,10 @@ cd C:\Users\raso8\ProjectPKL\docflow
 .\dev.ps1 up
 ```
 Buka `http://127.0.0.1:8650` (port dicatat di `.devport`).
+- `/` → landing page
+- `/register` → daftar akun baru
+- `/login` → masuk
+- `/app` → aplikasi (butuh login)
 
 **Akun demo** (semua password: `password`):
 - `admin@docflow.test` — ADMIN

@@ -86,4 +86,67 @@ class AuthenticationTest extends TestCase
 
         $this->actingAs($user)->postJson('/api/logout')->assertOk();
     }
+
+    public function test_user_can_register_and_is_signed_in(): void
+    {
+        $response = $this->postJson('/api/register', [
+            'name' => 'New Operator',
+            'email' => 'new@test.local',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'role' => 'OPERATOR',
+        ]);
+
+        $response->assertCreated()
+            ->assertJsonPath('user.email', 'new@test.local')
+            ->assertJsonPath('user.role', 'OPERATOR');
+
+        $this->assertAuthenticated();
+        $this->assertDatabaseHas('users', ['email' => 'new@test.local', 'role' => 'OPERATOR', 'is_active' => true]);
+    }
+
+    public function test_registration_defaults_to_operator_when_no_role_given(): void
+    {
+        $this->postJson('/api/register', [
+            'name' => 'No Role',
+            'email' => 'norole@test.local',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+        ])->assertCreated()->assertJsonPath('user.role', 'OPERATOR');
+    }
+
+    public function test_registration_cannot_self_assign_admin(): void
+    {
+        $this->postJson('/api/register', [
+            'name' => 'Sneaky',
+            'email' => 'sneaky@test.local',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'role' => 'ADMIN',
+        ])->assertStatus(422)->assertJsonValidationErrors('role');
+
+        $this->assertDatabaseMissing('users', ['email' => 'sneaky@test.local']);
+    }
+
+    public function test_registration_requires_matching_password_confirmation(): void
+    {
+        $this->postJson('/api/register', [
+            'name' => 'Mismatch',
+            'email' => 'mismatch@test.local',
+            'password' => 'password123',
+            'password_confirmation' => 'different123',
+        ])->assertStatus(422)->assertJsonValidationErrors('password');
+    }
+
+    public function test_registration_rejects_duplicate_email(): void
+    {
+        User::factory()->create(['email' => 'taken@test.local']);
+
+        $this->postJson('/api/register', [
+            'name' => 'Taken',
+            'email' => 'taken@test.local',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+        ])->assertStatus(422)->assertJsonValidationErrors('email');
+    }
 }

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { Loader2, LockKeyhole } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
 import { ApiError } from '@/lib/api'
@@ -25,7 +25,7 @@ export function LoginPage() {
   }
 
   if (user) {
-    const from = (location.state as { from?: string } | null)?.from ?? '/'
+    const from = (location.state as { from?: string } | null)?.from ?? '/app'
     return <Navigate to={from} replace />
   }
 
@@ -35,7 +35,7 @@ export function LoginPage() {
     setErrors({})
     try {
       await login(email.trim(), password, remember)
-      const from = (location.state as { from?: string } | null)?.from ?? '/'
+      const from = (location.state as { from?: string } | null)?.from ?? '/app'
       navigate(from, { replace: true })
     } catch (error) {
       if (error instanceof ApiError) {
@@ -143,6 +143,13 @@ export function LoginPage() {
               <li>reviewer@docflow.test · password</li>
             </ul>
           </div>
+
+          <p className="mt-6 text-center text-xs text-ink-500">
+            Don&apos;t have an account?{' '}
+            <Link to="/register" className="font-medium text-accent-600 hover:text-accent-700">
+              Create one
+            </Link>
+          </p>
         </div>
       </div>
     </div>

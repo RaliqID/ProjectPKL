@@ -21,6 +21,7 @@ import { useAuth } from '@/lib/auth'
 import { initials } from '@/lib/format'
 import { GlobalSearch } from '@/components/GlobalSearch'
 import { NotificationPanel } from '@/components/NotificationPanel'
+import { LiveIndicator } from '@/components/LiveIndicator'
 
 interface NavItem {
   to: string
@@ -30,15 +31,15 @@ interface NavItem {
 }
 
 const NAV: NavItem[] = [
-  { to: '/', label: 'Overview', icon: LayoutDashboard },
-  { to: '/transactions', label: 'Transactions', icon: Receipt },
-  { to: '/documents', label: 'Documents', icon: FileText },
-  { to: '/payments', label: 'Payments', icon: Wallet },
-  { to: '/deliveries', label: 'Deliveries', icon: Truck },
-  { to: '/customers', label: 'Customers', icon: Users },
-  { to: '/verification', label: 'Verification', icon: BadgeCheck },
-  { to: '/activity', label: 'Activity', icon: Activity },
-  { to: '/settings', label: 'Settings', icon: SettingsIcon, adminOnly: true },
+  { to: '/app', label: 'Overview', icon: LayoutDashboard },
+  { to: '/app/transactions', label: 'Transactions', icon: Receipt },
+  { to: '/app/documents', label: 'Documents', icon: FileText },
+  { to: '/app/payments', label: 'Payments', icon: Wallet },
+  { to: '/app/deliveries', label: 'Deliveries', icon: Truck },
+  { to: '/app/customers', label: 'Customers', icon: Users },
+  { to: '/app/verification', label: 'Verification', icon: BadgeCheck },
+  { to: '/app/activity', label: 'Activity', icon: Activity },
+  { to: '/app/settings', label: 'Settings', icon: SettingsIcon, adminOnly: true },
 ]
 
 export function AppShell() {
@@ -98,7 +99,7 @@ export function AppShell() {
                 <li key={item.to}>
                   <NavLink
                     to={item.to}
-                    end={item.to === '/'}
+                    end={item.to === '/app'}
                     className={({ isActive }) =>
                       clsx(
                         'flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm font-medium transition-colors',
@@ -157,7 +158,8 @@ export function AppShell() {
 
           <GlobalSearch />
 
-          <div className="ml-auto flex items-center gap-1">
+          <div className="ml-auto flex items-center gap-1.5">
+            <LiveIndicator />
             <button
               type="button"
               onClick={() => setNotifOpen((v) => !v)}

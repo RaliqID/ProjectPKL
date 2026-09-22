@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
-import { api, ApiError, ensureCsrf } from '@/lib/api'
+import { api, ApiError, ensureCsrf, resetCsrf } from '@/lib/api'
 import type { AuthUser, Permissions } from '@/types/api'
 
 interface AuthState {
@@ -8,6 +8,13 @@ interface AuthState {
   permissions: Permissions | null
   loading: boolean
   login: (email: string, password: string, remember?: boolean) => Promise<void>
+  register: (payload: {
+    name: string
+    email: string
+    password: string
+    password_confirmation: string
+    role?: string
+  }) => Promise<void>
   logout: () => Promise<void>
   refresh: () => Promise<void>
 }
@@ -55,18 +62,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setPermissions(data.permissions)
   }, [])
 
+  const register = useCallback(
+    async (payload: {
+      name: string
+      email: string
+      password: string
+      password_confirmation: string
+      role?: string
+    }) => {
+      const data = await api.post<{ user: AuthUser; permissions: Permissions }>('/api/register', payload)
+      setUser(data.user)
+      setPermissions(data.permissions)
+    },
+    [],
+  )
+
   const logout = useCallback(async () => {
     try {
       await api.post('/api/logout')
     } finally {
+      resetCsrf()
       setUser(null)
       setPermissions(null)
     }
   }, [])
 
   const value = useMemo(
-    () => ({ user, permissions, loading, login, logout, refresh }),
-    [user, permissions, loading, login, logout, refresh],
+    () => ({ user, permissions, loading, login, register, logout, refresh }),
+    [user, permissions, loading, login, register, logout, refresh],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
