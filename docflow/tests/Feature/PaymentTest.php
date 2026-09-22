@@ -158,4 +158,47 @@ class PaymentTest extends TestCase
         $this->assertSame(PaymentStatus::CONFIRMED, Payment::find($payment['id'])->status);
         $this->assertSame(TransactionStatus::PAID, $transaction->fresh()->status);
     }
+
+    /**
+     * Regression: the payable ceiling must include the invoice tax. Previously a
+     * full payment against an invoice with tax was wrongly rejected as overpayment.
+     */
+    public function test_full_payment_including_tax_is_accepted_and_marks_paid(): void
+    {
+        // Invoice with net 5,000,000 + tax 550,000 => payable 5,550,000.
+        $transaction = Transaction::create([
+            'transaction_code' => 'TRX-TAX-00001',
+            'customer_id' => $this->customer->id,
+            'transaction_date' => '2026-05-01',
+            'status' => TransactionStatus::PROCESSING,
+            'subtotal' => 5_000_000,
+            'tax' => 550_000,
+            'total_amount' => 5_550_000,
+            'created_by' => $this->operator->id,
+        ]);
+
+        Invoice::create([
+            'transaction_id' => $transaction->id,
+            'invoice_number' => 'INV-TAX-1',
+            'invoice_date' => '2026-05-02',
+            'due_date' => '2026-06-01',
+            'amount' => 5_000_000,
+            'tax_amount' => 550_000,
+            'status' => InvoiceStatus::ISSUED,
+            'created_by' => $this->operator->id,
+        ]);
+
+        $this->actingAs($this->operator)->postJson("/api/transactions/{$transaction->id}/payments", [
+            'amount' => 5_550_000,
+            'payment_date' => '2026-05-10',
+            'method' => 'BANK_TRANSFER',
+            'status' => 'CONFIRMED',
+        ])->assertCreated();
+
+        $transaction->refresh()->load('payments', 'invoices');
+        $this->assertSame('0.00', $transaction->outstandingAmount());
+        $this->assertTrue($transaction->isFullyPaid());
+        $this->assertSame(TransactionStatus::PAID, $transaction->status);
+        $this->assertSame(InvoiceStatus::PAID, $transaction->invoices->first()->status);
+    }
 }

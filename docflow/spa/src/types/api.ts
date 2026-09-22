@@ -8,6 +8,7 @@ export interface AuthUser {
   email: string
   role: UserRole
   role_label: string
+  role_description?: string
   is_active: boolean
 }
 

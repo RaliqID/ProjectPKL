@@ -95,3 +95,45 @@ export function metaFor(map: Record<string, StatusMeta>, status: string | undefi
   if (!status) return { label: '—', tone: 'neutral' }
   return map[status] ?? { label: status, tone: 'neutral' }
 }
+
+/** Role metadata — one source of truth for how each role is presented. */
+export const ROLES: Record<
+  string,
+  { label: string; tone: Tone; summary: string; capabilities: string[]; cannot: string[] }
+> = {
+  ADMIN: {
+    label: 'Administrator',
+    tone: 'info',
+    summary: 'Full access — manages people and settings, and can override the workflow.',
+    capabilities: [
+      'Create & update transactions, payments, deliveries',
+      'Upload, verify and reject documents',
+      'Run verification and override status transitions',
+      'Manage users and system settings',
+    ],
+    cannot: [],
+  },
+  OPERATOR: {
+    label: 'Operator',
+    tone: 'neutral',
+    summary: 'Runs the day-to-day operational work — records and documents.',
+    capabilities: [
+      'Create & update transactions, payments, deliveries',
+      'Upload documents',
+      'Run verification',
+    ],
+    cannot: ['Verify or reject documents', 'Override workflow status', 'Manage users or settings'],
+  },
+  REVIEWER: {
+    label: 'Reviewer',
+    tone: 'warning',
+    summary: 'Reviews and approves — read-mostly, with document review rights.',
+    capabilities: ['Review verification results', 'Verify or reject documents', 'View full audit history'],
+    cannot: ['Create or edit transactions', 'Record payments or deliveries', 'Upload documents'],
+  },
+}
+
+export function roleMeta(role: string | undefined | null) {
+  if (!role) return ROLES.OPERATOR
+  return ROLES[role] ?? ROLES.OPERATOR
+}

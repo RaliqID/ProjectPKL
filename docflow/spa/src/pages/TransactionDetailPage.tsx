@@ -69,6 +69,7 @@ export function TransactionDetailPage() {
 
   const statusMeta = metaFor(TRANSACTION_STATUS, trx.status)
   const canWrite = permissions?.can_write_transactions ?? false
+  const canReview = permissions?.can_review_documents ?? false
   const completion = trx.workflow.can_complete
 
   const handleComplete = async () => {
@@ -109,14 +110,18 @@ export function TransactionDetailPage() {
         actions={
           <>
             <StatusBadge label={statusMeta.label} tone={statusMeta.tone} />
+            {canWrite || canReview ? (
+              <Button icon={<RefreshCw className="h-4 w-4" />} onClick={handleVerify} loading={runVerification.isPending}>
+                Run Verification
+              </Button>
+            ) : null}
             {canWrite ? (
               <>
-                <Button icon={<RefreshCw className="h-4 w-4" />} onClick={handleVerify} loading={runVerification.isPending}>
-                  Run Verification
-                </Button>
-                <Button icon={<FileText className="h-4 w-4" />} onClick={() => setStatusOpen(true)}>
-                  Update Status
-                </Button>
+                {trx.status !== 'COMPLETED' && trx.status !== 'CANCELLED' ? (
+                  <Button icon={<FileText className="h-4 w-4" />} onClick={() => setStatusOpen(true)}>
+                    Update Status
+                  </Button>
+                ) : null}
                 <Button icon={<Plus className="h-4 w-4" />} onClick={() => setUploadOpen(true)}>
                   Add Document
                 </Button>
@@ -129,7 +134,7 @@ export function TransactionDetailPage() {
       {/* Summary strip */}
       <div className="border-b border-ink-200 bg-white px-6 py-4 lg:px-8">
         <div className="grid grid-cols-2 gap-x-8 gap-y-4 text-sm md:grid-cols-4">
-          <Field label="Total" value={<span className="font-semibold tabular-nums">{formatIDR(trx.total_amount)}</span>} />
+          <Field label="Total" value={<span className="font-semibold tabular-nums">{formatIDR(trx.financial.total_amount)}</span>} />
           <Field
             label="Outstanding"
             value={
@@ -289,7 +294,17 @@ function OverviewTab({
       <div className="space-y-6">
         <div className="df-card p-5">
           <h2 className="text-sm font-semibold text-ink-900">Workflow</h2>
-          {completion.allowed ? (
+          {trx.status === 'COMPLETED' ? (
+            <div className="mt-3 flex items-start gap-2 rounded-md bg-ok-50 p-3">
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-ok-600" aria-hidden />
+              <p className="text-xs text-ok-700">This transaction is completed. All conditions were met.</p>
+            </div>
+          ) : trx.status === 'CANCELLED' ? (
+            <div className="mt-3 flex items-start gap-2 rounded-md bg-ink-100 p-3">
+              <Info className="mt-0.5 h-4 w-4 shrink-0 text-ink-500" aria-hidden />
+              <p className="text-xs text-ink-600">This transaction was cancelled.</p>
+            </div>
+          ) : completion.allowed ? (
             <div className="mt-3 flex items-start gap-2 rounded-md bg-ok-50 p-3">
               <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-ok-600" aria-hidden />
               <p className="text-xs text-ok-700">All completion conditions are met. This transaction can be completed.</p>
@@ -308,7 +323,7 @@ function OverviewTab({
             </div>
           )}
 
-          {canWrite ? (
+          {canWrite && trx.status !== 'COMPLETED' && trx.status !== 'CANCELLED' ? (
             <div className="mt-4 space-y-2">
               <Button variant="primary" className="w-full" onClick={onRunVerify} loading={verifying}>
                 Run verification
@@ -417,7 +432,7 @@ function InvoiceTab({ invoices, canWrite, onAdd }: { invoices: NonNullable<Retur
 function PaymentTab({ trx, canWrite, onAdd }: { trx: NonNullable<ReturnType<typeof useTransaction>['data']>; canWrite: boolean; onAdd: () => void }) {
   const payments = trx.payments
   const totalPaid = payments.filter((p) => p.status === 'CONFIRMED').reduce((sum, p) => sum + Number(p.amount), 0)
-  const total = Number(trx.total_amount)
+  const total = Number(trx.financial.total_amount)
   const pct = total > 0 ? Math.min((totalPaid / total) * 100, 100) : 0
 
   return (
@@ -434,7 +449,7 @@ function PaymentTab({ trx, canWrite, onAdd }: { trx: NonNullable<ReturnType<type
         <div className="mt-4 grid grid-cols-3 gap-4 text-sm">
           <div>
             <p className="text-2xs uppercase tracking-wide text-ink-400">Total</p>
-            <p className="mt-0.5 font-semibold tabular-nums text-ink-900">{formatIDR(trx.total_amount)}</p>
+            <p className="mt-0.5 font-semibold tabular-nums text-ink-900">{formatIDR(trx.financial.total_amount)}</p>
           </div>
           <div>
             <p className="text-2xs uppercase tracking-wide text-ink-400">Paid</p>

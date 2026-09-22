@@ -8,6 +8,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge'
 import { FilterBar, FilterSelect, SearchInput } from '@/components/ui/Filters'
 import { Button } from '@/components/ui/Button'
 import { usePayments, usePaymentAction } from '@/lib/hooks'
+import { ReadOnlyBanner } from '@/components/RoleBadge'
 import { formatDate, formatIDR } from '@/lib/format'
 import { PAYMENT_METHODS, PAYMENT_STATUS, metaFor } from '@/lib/status'
 import { useToast } from '@/lib/toast'
@@ -104,6 +105,7 @@ export function PaymentsPage() {
         <FilterSelect label="Method" value={filters.method} onChange={(v) => update('method', v)} placeholder="All methods" options={PAYMENT_METHODS} />
       </FilterBar>
       <div className="p-6 lg:p-8">
+        <ReadOnlyBanner className="mb-4" />
         <div className="df-card overflow-hidden">
           <DataTable
             columns={columns}

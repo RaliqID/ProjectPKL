@@ -68,6 +68,12 @@ class PaymentService
 
             $this->syncInvoiceStatus($payment);
 
+            // If the payment was recorded already CONFIRMED, the transaction's
+            // paid state must advance immediately (not only on a later confirm).
+            if ($payment->status === PaymentStatus::CONFIRMED) {
+                $this->syncTransactionStatus($payment->transaction);
+            }
+
             return $payment;
         });
 
@@ -140,7 +146,7 @@ class PaymentService
 
         $status = match (true) {
             bccomp($paid, '0', 2) === 0 => $invoice->isOverdue() ? InvoiceStatus::OVERDUE : InvoiceStatus::ISSUED,
-            bccomp($paid, (string) $invoice->amount, 2) >= 0 => InvoiceStatus::PAID,
+            bccomp($paid, $invoice->totalAmount(), 2) >= 0 => InvoiceStatus::PAID,
             default => InvoiceStatus::PARTIALLY_PAID,
         };
 
