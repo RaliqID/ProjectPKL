@@ -1,0 +1,38 @@
+TRANSACTION LIFECYCLE (PROPOSED — DOCFLOW)
+
+  DRAFT
+    |
+    v
+  PROCESSING
+    |
+    v
+  AWAITING_PAYMENT ------------+
+    |                          |
+    v                          |
+   PAID                        |
+    |                          |
+    v                          |
+  PREPARING_DELIVERY           |
+    |                          |
+    v                          |
+  IN_DELIVERY                  |
+    |                          |
+    v                          |
+  DELIVERED                    |
+    |                          |
+    v                          |
+  COMPLETED                    |
+                               |
+  NEEDS_REVIEW <---------------+   (dari status aktif mana pun bila ada masalah verifikasi)
+    |
+    v
+  (kembali ke status yang sesuai setelah diperbaiki)
+
+  CANCELLED  -> mengakhiri alur
+
+ATURAN COMPLETION (harus terpenuhi semua):
+  [x] Invoice ada
+  [x] Payment lunas
+  [x] Delivery DELIVERED
+  [x] Dokumen wajib ada (Invoice, Delivery Order, Payment Proof)
+  [x] Verifikasi terakhir tanpa check FAILED

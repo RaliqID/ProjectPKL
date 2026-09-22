@@ -1,0 +1,35 @@
+VERIFICATION FLOW (PROPOSED — DOCFLOW, deterministik)
+
+  User klik "Run Verification"
+            |
+            v
+  VerificationService menjalankan 8 aturan berurutan:
+            |
+   +--------+-----------------------------------------------------+
+   | 1. Required Documents     -> dokumen wajib ada?              |
+   | 2. Customer Consistency   -> customer & invoice konsisten?   |
+   | 3. Invoice Amount         -> total invoice = total transaksi?|
+   | 4. Payment Balance        -> lunas / partial / lebih?        |
+   | 5. Delivery Tracking      -> ada tracking di tahap kirim?    |
+   | 6. Date Consistency       -> tanggal masuk akal?             |
+   | 7. Duplicate Document     -> ada nomor dokumen kembar?       |
+   | 8. Document File Validity -> file ada & tidak ditolak?       |
+   +--------+-----------------------------------------------------+
+            |
+            v
+   Setiap aturan -> PASS / WARNING / FAILED + message + metadata
+            |
+            v
+   Overall = status TERBURUK dari semua aturan
+            |
+            +--> PASS     : semua hijau
+            +--> WARNING  : ada peringatan (mis. partial payment)
+            +--> FAILED   : ada pelanggaran (mis. dokumen wajib hilang)
+                              |
+                              v
+                    Transaksi -> NEEDS_REVIEW + notifikasi HIGH severity
+
+Contoh keluaran:
+  Required Documents  FAILED   Missing: PAYMENT_PROOF
+  Invoice Amount      PASS     amount 7215000.00
+  Payment Balance     PASS     paid 7215000.00 / total 7215000.00
