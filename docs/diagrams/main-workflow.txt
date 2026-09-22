@@ -1,0 +1,29 @@
+MAIN WORKFLOW — Pengelolaan Data & Dokumen Operasional (ACTUAL)
+
+  DATA / DOKUMEN MASUK
+          |
+          v
+     PENGECEKAN
+          |
+          v
+   PENCOCOKAN DATA
+          |
+          v
+    INPUT / UPDATE
+          |
+          v
+    SCAN / RENAME
+          |
+          v
+    PENYIMPANAN
+          |
+          v
+      FILLING
+          |
+          v
+     MONITORING
+          |
+          v
+     VERIFIKASI
+
+Sumber data masuk: marketplace, Accurate, Excel, dashboard, WhatsApp, dokumen fisik.

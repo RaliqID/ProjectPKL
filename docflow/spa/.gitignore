@@ -1,0 +1,13 @@
+# Dependencies
+node_modules/
+
+# Build output (generated into ../public by vite build)
+dist/
+
+# Local env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
