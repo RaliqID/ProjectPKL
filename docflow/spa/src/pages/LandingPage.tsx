@@ -18,6 +18,7 @@ import {
 import { useAuth } from '@/lib/auth'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { Reveal } from '@/components/Reveal'
+import { Logo } from '@/components/Logo'
 
 /* ---------------------------------------------------------------- Nav ---- */
 
@@ -48,12 +49,7 @@ function LandingNav() {
       }
     >
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 lg:px-8">
-        <Link to="/" className="flex items-center gap-2.5" aria-label="DOCFLOW home">
-          <span className="flex h-7 w-7 items-center justify-center rounded-md bg-accent-600 text-xs font-bold text-white">
-            DF
-          </span>
-          <span className="text-sm font-semibold tracking-tight text-ink-900">DOCFLOW</span>
-        </Link>
+        <Logo to="/" size="md" />
 
         <nav className="hidden items-center gap-7 md:flex" aria-label="Sections">
           {links.map((l) => (
@@ -593,12 +589,7 @@ function Footer() {
     <footer className="border-t border-ink-200 bg-white">
       <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-6 px-5 py-10 lg:flex-row lg:items-center lg:px-8">
         <div>
-          <div className="flex items-center gap-2.5">
-            <span className="flex h-7 w-7 items-center justify-center rounded-md bg-accent-600 text-xs font-bold text-white">
-              DF
-            </span>
-            <span className="text-sm font-semibold tracking-tight text-ink-900">DOCFLOW</span>
-          </div>
+          <Logo to="/" size="md" />
           <p className="mt-3 max-w-md text-xs leading-relaxed text-ink-500">
             Document &amp; Transaction Operations Management System. A full-stack prototype built as
             an internship case study — independent of, and not affiliated with, any company system.
