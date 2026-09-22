@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
 import { StatusBadge } from '@/components/ui/StatusBadge'
+import { Reveal } from '@/components/Reveal'
 
 /* ---------------------------------------------------------------- Nav ---- */
 
@@ -142,38 +143,43 @@ function Hero() {
 
       <div className="relative mx-auto max-w-6xl px-5 pb-16 pt-16 lg:px-8 lg:pb-24 lg:pt-24">
         <div className="mx-auto max-w-3xl text-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-ink-200 bg-white px-3 py-1 text-xs text-ink-600">
-            <span className="h-1.5 w-1.5 rounded-full bg-accent-500" />
-            Independent prototype · inspired by an internship workflow
-          </span>
+          <Reveal>
+            <span className="inline-flex items-center gap-2 rounded-full border border-ink-200 bg-white px-3 py-1 text-xs text-ink-600">
+              <span className="h-1.5 w-1.5 rounded-full bg-accent-500" />
+              Independent prototype · inspired by an internship workflow
+            </span>
+          </Reveal>
 
-          <h1 className="mt-6 text-4xl font-semibold leading-[1.1] tracking-tight text-ink-900 sm:text-5xl">
-            One transaction, one source of operational context.
-          </h1>
+          <Reveal delay={80}>
+            <h1 className="mt-6 text-4xl font-semibold leading-[1.1] tracking-tight text-ink-900 sm:text-5xl">
+              One transaction, one source of operational context.
+            </h1>
+          </Reveal>
 
-          <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-ink-500">
-            DOCFLOW connects transactions, invoices, payments, deliveries, documents and
-            verification into a single traceable workflow — so nothing gets lost between
-            marketplace, spreadsheet, and chat.
-          </p>
+          <Reveal delay={160}>
+            <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-ink-500">
+              DOCFLOW connects transactions, invoices, payments, deliveries, documents and
+              verification into a single traceable workflow — so nothing gets lost between
+              marketplace, spreadsheet, and chat.
+            </p>
+          </Reveal>
 
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link to="/login" className="df-btn-primary px-5 py-2.5 text-sm">
-              Open the live demo
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-            <a href="#features" className="df-btn-secondary px-5 py-2.5 text-sm">
-              See how it works
-            </a>
-          </div>
-
-          <p className="mt-4 text-xs text-ink-400">
-            No setup · seeded with fictional data · 3 roles included
-          </p>
+          <Reveal delay={240}>
+            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Link to="/login" className="df-btn-primary px-5 py-2.5 text-sm">
+                Open the live demo
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <a href="#features" className="df-btn-secondary px-5 py-2.5 text-sm">
+                See how it works
+              </a>
+            </div>
+            <p className="mt-4 text-xs text-ink-400">No setup · seeded with fictional data · 3 roles included</p>
+          </Reveal>
         </div>
 
         {/* Product preview */}
-        <div className="mx-auto mt-14 max-w-5xl">
+        <Reveal delay={300} className="mx-auto mt-14 max-w-5xl">
           <div className="rounded-xl border border-ink-200 bg-white p-1.5 shadow-pop">
             <div className="flex items-center gap-1.5 px-3 py-2">
               <span className="h-2.5 w-2.5 rounded-full bg-ink-200" />
@@ -187,7 +193,7 @@ function Hero() {
               <HeroDashboardMock />
             </div>
           </div>
-        </div>
+        </Reveal>
       </div>
     </section>
   )
@@ -280,19 +286,21 @@ function Problem() {
     <section id="problem" className="border-t border-ink-200 bg-white py-20 lg:py-24">
       <div className="mx-auto max-w-6xl px-5 lg:px-8">
         <div className="max-w-2xl">
-          <p className="text-xs font-semibold uppercase tracking-widest text-accent-600">The problem</p>
-          <h2 className="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-3xl">
-            Operational data lives in too many places at once.
-          </h2>
-          <p className="mt-3 text-sm leading-relaxed text-ink-500">
-            An order moves through a marketplace, a spreadsheet, a chat thread and a folder of
-            scans. Every hand-off is a chance for the same transaction to be recorded twice,
-            named differently, or lost entirely.
-          </p>
+          <Reveal>
+            <p className="text-xs font-semibold uppercase tracking-widest text-accent-600">The problem</p>
+            <h2 className="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-3xl">
+              Operational data lives in too many places at once.
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed text-ink-500">
+              An order moves through a marketplace, a spreadsheet, a chat thread and a folder of
+              scans. Every hand-off is a chance for the same transaction to be recorded twice,
+              named differently, or lost entirely.
+            </p>
+          </Reveal>
         </div>
 
         <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <div className="df-card p-6">
+          <Reveal className="df-card p-6" from="left">
             <p className="text-xs font-semibold uppercase tracking-widest text-ink-400">Before</p>
             <ul className="mt-4 space-y-3">
               {before.map((item) => (
@@ -302,9 +310,9 @@ function Problem() {
                 </li>
               ))}
             </ul>
-          </div>
+          </Reveal>
 
-          <div className="df-card border-accent-200 p-6">
+          <Reveal className="df-card border-accent-200 p-6" from="right" delay={120}>
             <p className="text-xs font-semibold uppercase tracking-widest text-accent-600">With DOCFLOW</p>
             <ul className="mt-4 space-y-3">
               {[
@@ -320,7 +328,7 @@ function Problem() {
                 </li>
               ))}
             </ul>
-          </div>
+          </Reveal>
         </div>
       </div>
     </section>
@@ -367,26 +375,28 @@ function Features() {
     <section id="features" className="border-t border-ink-200 bg-ink-50 py-20 lg:py-24">
       <div className="mx-auto max-w-6xl px-5 lg:px-8">
         <div className="max-w-2xl">
-          <p className="text-xs font-semibold uppercase tracking-widest text-accent-600">Features</p>
-          <h2 className="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-3xl">
-            Built around the operational workflow.
-          </h2>
-          <p className="mt-3 text-sm leading-relaxed text-ink-500">
-            Every screen serves the workflow. Depth over feature count.
-          </p>
+          <Reveal>
+            <p className="text-xs font-semibold uppercase tracking-widest text-accent-600">Features</p>
+            <h2 className="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-3xl">
+              Built around the operational workflow.
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed text-ink-500">
+              Every screen serves the workflow. Depth over feature count.
+            </p>
+          </Reveal>
         </div>
 
         <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {FEATURES.map((f) => {
+          {FEATURES.map((f, i) => {
             const Icon = f.icon
             return (
-              <div key={f.title} className="df-card p-5 transition-shadow hover:shadow-pop">
+              <Reveal key={f.title} className="df-card p-5 transition-shadow hover:shadow-pop" delay={(i % 3) * 90}>
                 <div className="flex h-9 w-9 items-center justify-center rounded-md bg-accent-50 text-accent-600">
                   <Icon className="h-4.5 w-4.5" style={{ width: 18, height: 18 }} />
                 </div>
                 <h3 className="mt-4 text-sm font-semibold text-ink-900">{f.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-ink-500">{f.body}</p>
-              </div>
+              </Reveal>
             )
           })}
         </div>
@@ -410,7 +420,7 @@ function VerificationSection() {
   return (
     <section id="verification" className="border-t border-ink-200 bg-white py-20 lg:py-24">
       <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-5 lg:grid-cols-2 lg:px-8">
-        <div>
+        <Reveal from="left">
           <p className="text-xs font-semibold uppercase tracking-widest text-accent-600">Verification engine</p>
           <h2 className="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-3xl">
             Deterministic checks. Explainable results.
@@ -436,9 +446,9 @@ function VerificationSection() {
               </div>
             ))}
           </dl>
-        </div>
+        </Reveal>
 
-        <div className="df-card overflow-hidden">
+        <Reveal className="df-card overflow-hidden" from="right" delay={120}>
           <div className="flex items-center justify-between border-b border-ink-100 px-5 py-3.5">
             <div className="flex items-center gap-2.5">
               <Search className="h-4 w-4 text-ink-400" />
@@ -461,7 +471,7 @@ function VerificationSection() {
             <span className="text-xs text-ink-500">Overall</span>
             <span className="text-sm font-semibold text-bad-700">Failed</span>
           </div>
-        </div>
+        </Reveal>
       </div>
     </section>
   )
@@ -481,19 +491,21 @@ function HowItWorks() {
     <section id="how" className="border-t border-ink-200 bg-ink-50 py-20 lg:py-24">
       <div className="mx-auto max-w-6xl px-5 lg:px-8">
         <div className="max-w-2xl">
-          <p className="text-xs font-semibold uppercase tracking-widest text-accent-600">How it works</p>
-          <h2 className="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-3xl">
-            From first record to a completed transaction.
-          </h2>
+          <Reveal>
+            <p className="text-xs font-semibold uppercase tracking-widest text-accent-600">How it works</p>
+            <h2 className="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-3xl">
+              From first record to a completed transaction.
+            </h2>
+          </Reveal>
         </div>
 
         <ol className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {steps.map((s) => (
-            <li key={s.n} className="df-card p-5">
+          {steps.map((s, i) => (
+            <Reveal as="li" key={s.n} className="df-card p-5" delay={i * 90}>
               <span className="font-mono text-xs font-semibold text-accent-600">{s.n}</span>
               <h3 className="mt-3 text-sm font-semibold text-ink-900">{s.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-ink-500">{s.body}</p>
-            </li>
+            </Reveal>
           ))}
         </ol>
       </div>
@@ -514,21 +526,23 @@ function Roles() {
     <section className="border-t border-ink-200 bg-white py-20 lg:py-24">
       <div className="mx-auto max-w-6xl px-5 lg:px-8">
         <div className="max-w-2xl">
-          <p className="text-xs font-semibold uppercase tracking-widest text-accent-600">Access control</p>
-          <h2 className="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-3xl">
-            Roles enforced on the server.
-          </h2>
-          <p className="mt-3 text-sm leading-relaxed text-ink-500">
-            Permissions are checked in the API — not hidden in the interface.
-          </p>
+          <Reveal>
+            <p className="text-xs font-semibold uppercase tracking-widest text-accent-600">Access control</p>
+            <h2 className="mt-3 text-2xl font-semibold tracking-tight text-ink-900 sm:text-3xl">
+              Roles enforced on the server.
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed text-ink-500">
+              Permissions are checked in the API — not hidden in the interface.
+            </p>
+          </Reveal>
         </div>
 
         <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-3">
-          {roles.map((r) => (
-            <div key={r.name} className="df-card p-5">
+          {roles.map((r, i) => (
+            <Reveal key={r.name} className="df-card p-5" delay={i * 100}>
               <StatusBadge label={r.name} tone={r.tone} dot={false} />
               <p className="mt-4 text-sm leading-relaxed text-ink-500">{r.body}</p>
-            </div>
+            </Reveal>
           ))}
         </div>
       </div>
@@ -542,29 +556,31 @@ function FinalCta() {
   return (
     <section className="border-t border-ink-200 bg-ink-900 py-20 lg:py-24">
       <div className="mx-auto max-w-3xl px-5 text-center lg:px-8">
-        <Boxes className="mx-auto h-6 w-6 text-accent-400" aria-hidden />
-        <h2 className="mt-5 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-          Explore the working prototype.
-        </h2>
-        <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-ink-300">
-          Sign in with a demo account and walk a transaction from creation to verified completion —
-          with a real database behind every screen.
-        </p>
-        <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <Link to="/login" className="df-btn-primary px-5 py-2.5 text-sm">
-            Open the live demo
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-          <a
-            href="#features"
-            className="df-btn border border-white/15 bg-white/5 px-5 py-2.5 text-sm text-white hover:bg-white/10"
-          >
-            Review the features
-          </a>
-        </div>
-        <p className="mt-5 text-xs text-ink-500">
-          Independent prototype · fictional data only · not a production company system
-        </p>
+        <Reveal>
+          <Boxes className="mx-auto h-6 w-6 text-accent-400" aria-hidden />
+          <h2 className="mt-5 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+            Explore the working prototype.
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-ink-300">
+            Sign in with a demo account and walk a transaction from creation to verified completion —
+            with a real database behind every screen.
+          </p>
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link to="/login" className="df-btn-primary px-5 py-2.5 text-sm">
+              Open the live demo
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <a
+              href="#features"
+              className="df-btn border border-white/15 bg-white/5 px-5 py-2.5 text-sm text-white hover:bg-white/10"
+            >
+              Review the features
+            </a>
+          </div>
+          <p className="mt-5 text-xs text-ink-500">
+            Independent prototype · fictional data only · not a production company system
+          </p>
+        </Reveal>
       </div>
     </section>
   )
