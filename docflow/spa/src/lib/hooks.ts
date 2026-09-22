@@ -20,6 +20,9 @@ export function useOverview() {
   return useQuery({
     queryKey: ['overview'],
     queryFn: () => api.get<{ data: OverviewData }>('/api/overview').then((r) => r.data),
+    // Near-realtime: the overview is the "what needs attention" surface, so it
+    // polls while the tab is visible.
+    refetchInterval: 15000,
   })
 }
 
@@ -100,6 +103,7 @@ export function useVerificationQueue(filters: Record<string, unknown> = {}) {
         `/api/verification/queue${toQuery(filters)}`,
       ),
     placeholderData: (prev) => prev,
+    refetchInterval: 20000,
   })
 }
 

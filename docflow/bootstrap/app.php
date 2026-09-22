@@ -35,22 +35,27 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Canonical Laravel Sanctum SPA authentication: /api/* shares the web
-        // session + CSRF protection when the request looks stateful (Origin/Referer
-        // matches SANCTUM_STATEFUL_DOMAINS).
-        $middleware->statefulApi();
-
-        // Also start a session for EVERY api request. Sanctum's stateful detection
-        // relies on an Origin/Referer header, which same-document navigations and
-        // tooling (curl, HTTP tests) omit. Starting the session explicitly makes
-        // session auth deterministic regardless of headers, while EncryptCookies
-        // keeps the cookie secure. This is what prevents "Session store not set".
+        // The SPA is served from the SAME origin as the API, so session auth is
+        // the natural fit — no tokens, no CORS. We give the api group the full
+        // session pipeline explicitly (EncryptCookies → StartSession →
+        // SubstituteBindings) so the session cookie is always written on the
+        // response, regardless of Origin/Referer headers that Sanctum's
+        // stateful detection would otherwise require.
+        //
+        // CSRF protection for state-changing requests is preserved by the
+        // ValidateCsrfToken middleware below.
         $middleware->api(prepend: [
             \Illuminate\Cookie\Middleware\EncryptCookies::class,
             \Illuminate\Session\Middleware\StartSession::class,
+            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
         ]);
 
-        // Trust the local dev host for CORS/cookies during development.
+        $middleware->api(append: [
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
+        ]);
+
+        // Trust the local dev host for proxies during development.
         $middleware->trustProxies(at: '*');
 
         $middleware->alias([

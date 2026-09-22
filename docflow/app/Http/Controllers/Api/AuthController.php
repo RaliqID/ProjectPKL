@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use App\Services\ActivityLogService;
 use Illuminate\Http\JsonResponse;
@@ -38,11 +40,14 @@ class AuthController extends Controller
         }
 
         if ($request->boolean('remember')) {
-            Auth::login($user, true);
+            Auth::guard('web')->login($user, true);
         } else {
-            Auth::login($user);
+            Auth::guard('web')->login($user);
         }
 
+        // Rotate the session id on privilege change (standard practice) and write
+        // it back on this response so the new cookie reaches the browser before
+        // the SPA navigates. The SPA shell shares this same session.
         $request->session()->regenerate();
 
         $this->activity->log('auth', $user->id, 'auth.login', "{$user->name} signed in");
@@ -51,6 +56,34 @@ class AuthController extends Controller
             'user' => $this->userPayload($user),
             'permissions' => $this->permissions($user),
         ]);
+    }
+
+    /**
+     * Public self-registration. New accounts are created active and signed in
+     * immediately. ADMIN cannot be self-assigned — only an existing admin can
+     * grant it via the settings/users screen.
+     */
+    public function register(RegisterRequest $request): JsonResponse
+    {
+        $data = $request->validated();
+
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => $data['password'],
+            'role' => isset($data['role']) ? UserRole::from($data['role']) : UserRole::OPERATOR,
+            'is_active' => true,
+        ]);
+
+        Auth::guard('web')->login($user);
+        $request->session()->regenerate();
+
+        $this->activity->log('auth', $user->id, 'auth.registered', "{$user->name} registered a new account");
+
+        return response()->json([
+            'user' => $this->userPayload($user),
+            'permissions' => $this->permissions($user),
+        ], 201);
     }
 
     public function logout(Request $request): JsonResponse

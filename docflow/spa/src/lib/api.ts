@@ -28,14 +28,28 @@ function readCookie(name: string): string | null {
 
 let csrfReady: Promise<void> | null = null
 
+/**
+ * Ensure an XSRF cookie exists.
+ *
+ * IMPORTANT: once we already hold an XSRF-TOKEN cookie (or we are authenticated),
+ * we must NOT call /sanctum/csrf-cookie again — that endpoint mints a brand-new
+ * guest session, which would discard the session that just authenticated us and
+ * log the user out on the next navigation.
+ */
 export async function ensureCsrf(): Promise<void> {
+  if (readCookie('XSRF-TOKEN')) return
   if (csrfReady) return csrfReady
   csrfReady = fetch('/sanctum/csrf-cookie', { credentials: 'same-origin' })
     .then(() => undefined)
     .catch(() => {
-      // Non-fatal: the XSRF cookie may already be present.
+      // Non-fatal: the XSRF cookie may already be present via another path.
     })
   return csrfReady
+}
+
+/** Forget the cached CSRF promise (used after logout). */
+export function resetCsrf(): void {
+  csrfReady = null
 }
 
 async function request<T>(method: string, url: string, body?: unknown): Promise<T> {
