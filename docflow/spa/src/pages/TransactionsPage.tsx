@@ -8,15 +8,19 @@ import { StatusBadge } from '@/components/ui/StatusBadge'
 import { FilterBar, FilterSelect, SearchInput } from '@/components/ui/Filters'
 import { Button } from '@/components/ui/Button'
 import { useTransactions } from '@/lib/hooks'
+import { useAuth } from '@/lib/auth'
 import { formatIDR, formatDate } from '@/lib/format'
 import { metaFor, TRANSACTION_STATUS } from '@/lib/status'
 import type { Transaction } from '@/types/api'
 import { CreateTransactionModal } from '@/features/transactions/CreateTransactionModal'
+import { ReadOnlyBanner } from '@/components/RoleBadge'
 
 export function TransactionsPage() {
   const [params, setParams] = useSearchParams()
   const navigate = useNavigate()
   const [createOpen, setCreateOpen] = useState(false)
+  const { permissions } = useAuth()
+  const canWrite = permissions?.can_write_transactions ?? false
 
   const page = Number(params.get('page') ?? 1)
   const filters = {
@@ -110,12 +114,18 @@ export function TransactionsPage() {
             <Button onClick={() => update('q', '')} variant="secondary" className="hidden sm:inline-flex">
               Reset
             </Button>
-            <Button variant="primary" icon={<Plus className="h-4 w-4" />} onClick={() => setCreateOpen(true)}>
-              New Transaction
-            </Button>
+            {canWrite ? (
+              <Button variant="primary" icon={<Plus className="h-4 w-4" />} onClick={() => setCreateOpen(true)}>
+                New Transaction
+              </Button>
+            ) : null}
           </>
         }
       />
+
+      <div className="px-6 pt-6 lg:px-8">
+        <ReadOnlyBanner />
+      </div>
 
       <FilterBar>
         <SearchInput
@@ -163,11 +173,17 @@ export function TransactionsPage() {
               setParams(next, { replace: true })
             }}
             emptyTitle="No transactions yet"
-            emptyDescription="Create your first transaction to start tracking operational activity."
+            emptyDescription={
+              canWrite
+                ? 'Create your first transaction to start tracking operational activity.'
+                : 'No transactions match the current filters.'
+            }
             emptyAction={
-              <Button variant="primary" icon={<Plus className="h-4 w-4" />} onClick={() => setCreateOpen(true)}>
-                New Transaction
-              </Button>
+              canWrite ? (
+                <Button variant="primary" icon={<Plus className="h-4 w-4" />} onClick={() => setCreateOpen(true)}>
+                  New Transaction
+                </Button>
+              ) : undefined
             }
             pagination={
               data?.meta

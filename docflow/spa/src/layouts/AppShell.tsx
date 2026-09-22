@@ -23,6 +23,7 @@ import { GlobalSearch } from '@/components/GlobalSearch'
 import { NotificationPanel } from '@/components/NotificationPanel'
 import { LiveIndicator } from '@/components/LiveIndicator'
 import { Logo } from '@/components/Logo'
+import { RoleBadge } from '@/components/RoleBadge'
 
 interface NavItem {
   to: string
@@ -152,6 +153,7 @@ export function AppShell() {
           <GlobalSearch />
 
           <div className="ml-auto flex items-center gap-1.5">
+            <RoleBadge />
             <LiveIndicator />
             <button
               type="button"

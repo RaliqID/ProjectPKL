@@ -67,8 +67,28 @@ class WorkflowService
         $transaction->loadMissing('invoices', 'payments', 'deliveries', 'documents', 'latestVerificationRun');
         $reasons = [];
 
+        // Already-complete (or cancelled) transactions have nothing left to do.
+        if ($transaction->status === TransactionStatus::COMPLETED) {
+            return ['allowed' => false, 'reasons' => ['This transaction is already completed.']];
+        }
+        if ($transaction->status === TransactionStatus::CANCELLED) {
+            return ['allowed' => false, 'reasons' => ['This transaction was cancelled.']];
+        }
+
         if ($transaction->invoices->isEmpty()) {
             $reasons[] = 'Invoice is missing.';
+        }
+
+        // The workflow cannot be short-circuited: a transaction must have advanced
+        // through its stages (at least PAID) before it can be completed.
+        $allowedStages = [
+            \App\Enums\TransactionStatus::PAID,
+            \App\Enums\TransactionStatus::PREPARING_DELIVERY,
+            \App\Enums\TransactionStatus::IN_DELIVERY,
+            \App\Enums\TransactionStatus::DELIVERED,
+        ];
+        if (! in_array($transaction->status, $allowedStages, true)) {
+            $reasons[] = 'Transaction has not reached a delivery-ready stage yet.';
         }
 
         if (! $transaction->isFullyPaid()) {

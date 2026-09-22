@@ -53,9 +53,17 @@ class Invoice extends Model
             ->reduce(fn ($carry, $p) => bcadd($carry, (string) $p->amount, 2), '0.00');
     }
 
+    /**
+     * The full amount the customer owes for this invoice: the net amount plus tax.
+     */
+    public function totalAmount(): string
+    {
+        return bcadd((string) $this->amount, (string) $this->tax_amount, 2);
+    }
+
     public function remainingAmount(): string
     {
-        $remaining = bcsub((string) $this->amount, $this->confirmedPaidAmount(), 2);
+        $remaining = bcsub($this->totalAmount(), $this->confirmedPaidAmount(), 2);
 
         return bccomp($remaining, '0', 2) < 0 ? '0.00' : $remaining;
     }

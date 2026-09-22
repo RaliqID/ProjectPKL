@@ -81,6 +81,9 @@ satu warna aksen (indigo) yang restrained, warna hanya untuk status yang bermakn
 | **Registrasi akun (self sign-up)** | ✅ |
 | **Realtime — auto-refresh + indikator "Live · Ns ago"** | ✅ |
 | **Landing page profesional (publik di `/`)** | ✅ |
+| **Logo brand + favicon** | ✅ |
+| **Dokumen per jenis (11 tab: Invoice → Journal → BA → Other)** | ✅ |
+| **Perbedaan role terlihat di UI (badge + banner + aksi ter-gate)** | ✅ |
 | Role ADMIN/OPERATOR/REVIEWER (server-side) | ✅ |
 | Overview "apa yang perlu ditindak" (query nyata) | ✅ |
 | Attention queue (severity dari kondisi nyata) | ✅ |
@@ -116,6 +119,57 @@ Setelah daftar, langsung login otomatis.
 (overview, verification queue, activity) di-*poll* berkala lewat React Query.
 Indikator di topbar menunjukkan **"Live · Ns ago"** yang benar-benar menghitung
 waktu sejak refresh terakhir, dan bisa diklik untuk refresh manual.
+
+---
+
+## 5c. Perbedaan Role (Jelas & Terlihat)
+
+| Kemampuan | ADMIN | OPERATOR | REVIEWER |
+|---|:--:|:--:|:--:|
+| Lihat dashboard & data | ✅ | ✅ | ✅ |
+| Buat/ubah transaksi | ✅ | ✅ | ❌ |
+| Catat payment & delivery | ✅ | ✅ | ❌ |
+| Upload dokumen | ✅ | ✅ | ❌ |
+| Verify / reject dokumen | ✅ | ❌ | ✅ |
+| Jalankan verifikasi | ✅ | ✅ | ✅ |
+| Override status workflow | ✅ | ❌ | ❌ |
+| Kelola user & setting | ✅ | ❌ | ❌ |
+
+Perbedaan ini **ditampilkan** di UI:
+- **Role badge** di topbar (klik → lihat daftar "Can" & "Locked").
+- **Banner** di halaman transaksi untuk role read-only.
+- **Tombol aksi** yang tidak diizinkan disembunyikan/disabled (bukan error diam-diam).
+- Server tetap menegakkan otorisasi (UI hanya lapisan tampilan).
+
+---
+
+## 5d. Dokumen per Jenis
+
+Halaman Documents punya **11 tab**: All, Invoice, Delivery Order, Receipt, Payment Proof,
+Tax Invoice, Purchase Order, Sales Order, **Journal**, Berita Acara (BA), dan Other —
+mengikuti pekerjaan operasional nyata (invoice, resi, jurnal, BA, dsb).
+Data seed mengisi **semua** jenis supaya tiap tab ada isinya dan bisa didemonstrasikan.
+
+---
+
+## 5e. Alur End-to-End yang Terverifikasi
+
+Satu transaksi diuji penuh dari nol sampai selesai (nyata, bukan mock):
+
+```text
+Create (DRAFT) → PROCESSING → AWAITING_PAYMENT
+        → Invoice
+        → Payment lunas  → otomatis PAID
+        → PREPARING_DELIVERY → Delivery (courier + tracking)
+        → Upload 3 dokumen wajib (Invoice, DO, Payment Proof)
+        → SHIPPED → IN_TRANSIT → DELIVERED
+        → Verification = PASS (score 100)
+        → Completion gate = allowed
+        → COMPLETED  ✅
+```
+
+Setiap langkah tercatat di **Activity timeline** (audit), dan transaksi
+yang belum lengkap **diblokir** dengan alasan yang jelas.
 
 ---
 

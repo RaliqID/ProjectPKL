@@ -1,19 +1,30 @@
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { DataTable } from '@/components/ui/DataTable'
 import type { Column } from '@/components/ui/DataTable'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { FilterBar, FilterSelect, SearchInput } from '@/components/ui/Filters'
 import { useDocuments } from '@/lib/hooks'
+import { DocumentReviewNote } from '@/components/RoleBadge'
 import { formatDateTime } from '@/lib/format'
 import { DOCUMENT_STATUS, DOCUMENT_TYPES, metaFor } from '@/lib/status'
 import type { Document } from '@/types/api'
+import clsx from 'clsx'
+
+/** Tabs = "All" plus every document type, so every operational document has a home. */
+const TYPE_TABS: { value: string; label: string }[] = [
+  { value: '', label: 'All' },
+  ...DOCUMENT_TYPES,
+]
 
 export function DocumentsPage() {
   const [params, setParams] = useSearchParams()
+  const navigate = useNavigate()
+
+  const activeType = params.get('document_type') ?? ''
   const filters = {
     q: params.get('q') ?? '',
-    document_type: params.get('document_type') ?? '',
+    document_type: activeType,
     status: params.get('status') ?? '',
     page: Number(params.get('page') ?? 1),
     per_page: 15,
@@ -63,10 +74,35 @@ export function DocumentsPage() {
 
   return (
     <div>
-      <PageHeader title="Documents" description="Every uploaded operational document, searchable and filterable." />
+      <PageHeader
+        title="Documents"
+        description="Every uploaded operational document, grouped by type — from invoices to journals."
+      />
+
+      {/* Type tabs */}
+      <div className="border-b border-ink-200 bg-white px-6 lg:px-8">
+        <nav className="-mb-px flex gap-1 overflow-x-auto" aria-label="Document types">
+          {TYPE_TABS.map((t) => (
+            <button
+              key={t.value || 'all'}
+              type="button"
+              onClick={() => update('document_type', t.value)}
+              aria-current={activeType === t.value ? 'page' : undefined}
+              className={clsx(
+                'whitespace-nowrap border-b-2 px-3 py-3 text-xs font-medium transition-colors',
+                activeType === t.value
+                  ? 'border-accent-600 text-accent-700'
+                  : 'border-transparent text-ink-500 hover:border-ink-300 hover:text-ink-800',
+              )}
+            >
+              {t.label}
+            </button>
+          ))}
+        </nav>
+      </div>
+
       <FilterBar>
         <SearchInput value={filters.q} onChange={(v) => update('q', v)} placeholder="Search file, number, transaction…" className="w-full sm:w-64" />
-        <FilterSelect label="Type" value={filters.document_type} onChange={(v) => update('document_type', v)} placeholder="All types" options={DOCUMENT_TYPES} />
         <FilterSelect
           label="Status"
           value={filters.status}
@@ -75,7 +111,9 @@ export function DocumentsPage() {
           options={Object.entries(DOCUMENT_STATUS).map(([value, m]) => ({ value, label: m.label }))}
         />
       </FilterBar>
+
       <div className="p-6 lg:p-8">
+        <DocumentReviewNote />
         <div className="df-card overflow-hidden">
           <DataTable
             columns={columns}
@@ -84,8 +122,9 @@ export function DocumentsPage() {
             error={error ? 'Could not load documents.' : null}
             onRetry={() => refetch()}
             rowKey={(d) => d.id}
-            emptyTitle="No documents found"
-            emptyDescription="Try adjusting the filters, or upload documents from a transaction."
+            onRowClick={(d) => d.transaction_id && navigate(`/app/transactions/${d.transaction_id}`)}
+            emptyTitle="No documents yet"
+            emptyDescription="No documents match this type and filter. Try another type tab or clear the filters."
             pagination={
               data?.meta
                 ? { page: data.meta.current_page, lastPage: data.meta.last_page, total: data.meta.total, onPageChange: (p) => update('page', String(p)) }

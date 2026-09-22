@@ -73,6 +73,10 @@ class OperationsSeeder extends Seeder
         $this->scenarioF_delayedDelivery($customers[5], $operator);
         $this->scenarioG_duplicateInvoice($customers[6], $operator);
 
+        // Populate every remaining document type so each document tab has content:
+        // Receipt, Tax Invoice, Purchase Order, Sales Order, Journal, BA, Other.
+        $this->seedSupportingDocuments($operator);
+
         // Run verification once for every open transaction so the overview
         // and verification queue start populated.
         $verification = app(VerificationService::class);
@@ -248,12 +252,66 @@ class OperationsSeeder extends Seeder
         }
     }
 
+    /**
+     * Attach the "supporting" document types to a spread of transactions, so the
+     * Documents page has real content under every type tab (Receipt, Tax Invoice,
+     * Purchase Order, Sales Order, Journal, BA, Other).
+     */
+    private function seedSupportingDocuments(User $operator): void
+    {
+        $transactions = Transaction::whereNotIn('status', [TransactionStatus::DRAFT])
+            ->inRandomOrder()
+            ->limit(40)
+            ->get();
+
+        // How many transactions get each supporting type. Keys are plain strings
+        // (PHP arrays cannot use enum instances as keys).
+        $plan = [
+            DocumentType::RECEIPT->value => 26,
+            DocumentType::TAX_INVOICE->value => 22,
+            DocumentType::PURCHASE_ORDER->value => 18,
+            DocumentType::SALES_ORDER->value => 16,
+            DocumentType::JOURNAL->value => 14,
+            DocumentType::BA->value => 10,
+            DocumentType::OTHER->value => 8,
+        ];
+
+        foreach ($plan as $typeValue => $count) {
+            $type = DocumentType::from($typeValue);
+            $transactions->take($count)->each(function (Transaction $trx, int $i) use ($type, $operator) {
+                // Vary status so the Documents page shows uploaded / verified / rejected.
+                // Guard the date: the model may return a Carbon instance or a string.
+                $base = $trx->transaction_date;
+                $when = $base
+                    ? \Illuminate\Support\Carbon::parse($base)->addDays(random_int(1, 12))
+                    : now()->subDays(random_int(3, 60));
+
+                $document = $this->createDocument($trx, $operator, $type, $when, $i % 13 === 0);
+
+                if ($i % 4 === 0) {
+                    $document->forceFill([
+                        'status' => DocumentStatus::VERIFIED,
+                        'verified_at' => $when,
+                    ])->save();
+                } elseif ($i % 7 === 0) {
+                    $document->forceFill(['status' => DocumentStatus::UNDER_REVIEW])->save();
+                }
+            });
+        }
+    }
+
     private function createDocument(Transaction $transaction, User $operator, DocumentType $type, $when, bool $rejected = false): Document
     {
         $number = match ($type) {
             DocumentType::INVOICE => $transaction->invoices()->value('invoice_number'),
             DocumentType::PAYMENT_PROOF => 'PAY-'.strtoupper(Str::random(6)),
             DocumentType::DELIVERY_ORDER => $transaction->deliveries()->value('tracking_number') ?: 'DO-'.random_int(1000, 9999),
+            DocumentType::RECEIPT => 'RCPT-'.random_int(10000, 99999),
+            DocumentType::TAX_INVOICE => '010.'.random_int(100, 999).'-'.random_int(10, 99).'.'.random_int(10000000, 99999999),
+            DocumentType::PURCHASE_ORDER => $transaction->purchase_order_number ?: 'PO-'.random_int(10000, 99999),
+            DocumentType::SALES_ORDER => $transaction->sales_order_number ?: 'SO-'.random_int(10000, 99999),
+            DocumentType::JOURNAL => 'JV-'.now()->format('Y').'-'.str_pad((string) random_int(1, 9999), 4, '0', STR_PAD_LEFT),
+            DocumentType::BA => 'BA-'.str_pad((string) random_int(1, 999), 3, '0', STR_PAD_LEFT),
             default => strtoupper(Str::random(8)),
         };
 
