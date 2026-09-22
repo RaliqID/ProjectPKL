@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/auth'
 import { ApiError } from '@/lib/api'
 import { Button } from '@/components/ui/Button'
 import { TextInput } from '@/components/ui/Form'
+import { Logo } from '@/components/Logo'
 
 export function LoginPage() {
   const { user, loading, login } = useAuth()
@@ -52,10 +53,7 @@ export function LoginPage() {
     <div className="flex min-h-screen bg-ink-50">
       {/* Brand panel */}
       <div className="hidden w-1/2 flex-col justify-between bg-ink-900 p-10 text-white lg:flex">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-accent-500 text-sm font-bold">DF</div>
-          <span className="text-sm font-semibold tracking-tight">DOCFLOW</span>
-        </div>
+        <Logo to="/" variant="light" size="md" />
         <div className="max-w-md">
           <h1 className="text-2xl font-semibold leading-snug tracking-tight">
             One transaction, one source of operational context.
@@ -87,12 +85,7 @@ export function LoginPage() {
       {/* Form panel */}
       <div className="flex w-full items-center justify-center px-6 py-12 lg:w-1/2">
         <div className="w-full max-w-sm">
-          <div className="mb-8 flex items-center gap-2.5 lg:hidden">
-            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-accent-600 text-sm font-bold text-white">
-              DF
-            </div>
-            <span className="text-sm font-semibold tracking-tight text-ink-900">DOCFLOW</span>
-          </div>
+          <Logo to="/" size="md" className="mb-8 lg:hidden" />
 
           <h2 className="text-lg font-semibold tracking-tight text-ink-900">Sign in</h2>
           <p className="mt-1 text-sm text-ink-500">Use a demo account to explore the workspace.</p>

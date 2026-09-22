@@ -22,6 +22,7 @@ import { initials } from '@/lib/format'
 import { GlobalSearch } from '@/components/GlobalSearch'
 import { NotificationPanel } from '@/components/NotificationPanel'
 import { LiveIndicator } from '@/components/LiveIndicator'
+import { Logo } from '@/components/Logo'
 
 interface NavItem {
   to: string
@@ -72,15 +73,7 @@ export function AppShell() {
         )}
       >
         <div className="flex h-14 items-center justify-between border-b border-ink-200 px-4">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-accent-600 text-xs font-bold text-white">
-              DF
-            </div>
-            <div className="leading-none">
-              <p className="text-sm font-semibold tracking-tight text-ink-900">DOCFLOW</p>
-              <p className="mt-0.5 text-2xs text-ink-400">Organize. Verify. Track.</p>
-            </div>
-          </div>
+          <Logo to="/" size="md" withTagline />
           <button
             type="button"
             className="rounded-md p-1 text-ink-400 hover:bg-ink-100 lg:hidden"

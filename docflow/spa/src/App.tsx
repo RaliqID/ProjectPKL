@@ -2,6 +2,7 @@ import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import { Loader2 } from 'lucide-react'
 import { AppShell } from '@/layouts/AppShell'
+import { LogoMark } from '@/components/Logo'
 import { useAuth } from '@/lib/auth'
 import { LandingPage } from '@/pages/LandingPage'
 import { LoginPage } from '@/pages/LoginPage'
@@ -23,9 +24,7 @@ function FullScreenLoader() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-ink-50">
       <div className="flex flex-col items-center gap-3">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-600 text-sm font-bold text-white">
-          DF
-        </div>
+        <LogoMark className="h-9 w-9" />
         <Loader2 className="h-4 w-4 animate-spin text-ink-400" aria-hidden />
         <p className="text-xs text-ink-400">Loading workspace…</p>
       </div>

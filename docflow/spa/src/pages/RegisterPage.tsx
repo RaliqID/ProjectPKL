@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/auth'
 import { ApiError } from '@/lib/api'
 import { Button } from '@/components/ui/Button'
 import { TextInput, Select } from '@/components/ui/Form'
+import { Logo } from '@/components/Logo'
 
 export function RegisterPage() {
   const { user, loading, register } = useAuth()
@@ -59,10 +60,7 @@ export function RegisterPage() {
     <div className="flex min-h-screen bg-ink-50">
       {/* Brand panel */}
       <div className="hidden w-1/2 flex-col justify-between bg-ink-900 p-10 text-white lg:flex">
-        <Link to="/" className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-accent-500 text-sm font-bold">DF</div>
-          <span className="text-sm font-semibold tracking-tight">DOCFLOW</span>
-        </Link>
+        <Logo to="/" variant="light" size="md" />
         <div className="max-w-md">
           <h1 className="text-2xl font-semibold leading-snug tracking-tight">
             Create your account and start tracking operations.
