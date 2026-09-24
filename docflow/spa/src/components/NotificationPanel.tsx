@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { BellOff, CheckCheck, X } from 'lucide-react'
 import { api } from '@/lib/api'
@@ -8,6 +8,7 @@ import { SEVERITY_META } from '@/lib/status'
 import { formatRelative } from '@/lib/format'
 import { Button } from '@/components/ui/Button'
 import { useToast } from '@/lib/toast'
+import { reportFailure, reportQuietly } from '@/lib/report'
 
 export function NotificationPanel({ onClose }: { onClose: () => void }) {
   const [items, setItems] = useState<AppNotification[]>([])
@@ -22,7 +23,10 @@ export function NotificationPanel({ onClose }: { onClose: () => void }) {
       )
       setItems(data.data)
       window.dispatchEvent(new CustomEvent('docflow:unread', { detail: data.meta.unread_count }))
-    } catch {
+    } catch (error) {
+      // An empty panel is the right fallback, but a failed fetch and "no
+      // notifications" must not look identical in a log.
+      reportQuietly('load notifications', error)
       setItems([])
     } finally {
       setLoading(false)
@@ -40,8 +44,10 @@ export function NotificationPanel({ onClose }: { onClose: () => void }) {
       setItems((current) => current.map((n) => ({ ...n, is_unread: false, read_at: new Date().toISOString() })))
       window.dispatchEvent(new CustomEvent('docflow:unread', { detail: 0 }))
       toast.success('All notifications marked as read')
-    } catch {
-      toast.error('Could not update notifications')
+    } catch (error) {
+      // The cause is logged rather than discarded, so a failure that a user
+      // reports can actually be looked up.
+      reportFailure('mark all notifications read', error, toast, 'Could not update notifications')
     }
   }
 
@@ -50,8 +56,11 @@ export function NotificationPanel({ onClose }: { onClose: () => void }) {
       try {
         await api.post(`/api/notifications/${n.id}/read`)
         setItems((current) => current.map((i) => (i.id === n.id ? { ...i, is_unread: false } : i)))
-      } catch {
-        /* non-fatal */
+      } catch (error) {
+        // Non-fatal on purpose: navigation still happens, and the badge will be
+        // corrected on the next poll. Only the cause is recorded, so the failure
+        // is not silent.
+        reportQuietly('mark notification read', error)
       }
     }
     if (n.entity_type === 'transaction' && n.entity_id) {
@@ -89,7 +98,7 @@ export function NotificationPanel({ onClose }: { onClose: () => void }) {
 
         <div className="max-h-96 overflow-y-auto">
           {loading ? (
-            <div className="px-4 py-6 text-center text-xs text-ink-400">Loading…</div>
+            <div className="px-4 py-6 text-center text-xs text-ink-400">Loadingâ€¦</div>
           ) : items.length === 0 ? (
             <div className="flex flex-col items-center px-4 py-10 text-center">
               <BellOff className="mb-2 h-5 w-5 text-ink-300" aria-hidden />

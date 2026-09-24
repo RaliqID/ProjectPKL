@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
+﻿import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search, X } from 'lucide-react'
 import { api } from '@/lib/api'
+import { reportQuietly } from '@/lib/report'
 import type { SearchResult } from '@/types/api'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { metaFor, TRANSACTION_STATUS } from '@/lib/status'
@@ -27,7 +28,10 @@ export function GlobalSearch() {
       try {
         const data = await api.get<{ data: SearchResult[] }>(`/api/search?q=${encodeURIComponent(query)}`)
         if (active) setResults(data.data)
-      } catch {
+      } catch (error) {
+        // Showing no results is the right behaviour for a search box, but the
+        // cause is recorded so a broken endpoint is not mistaken for "no match".
+        reportQuietly('search', error)
         if (active) setResults([])
       } finally {
         if (active) setLoading(false)
@@ -76,7 +80,7 @@ export function GlobalSearch() {
           setOpen(true)
         }}
         onFocus={() => setOpen(true)}
-        placeholder="Search transactions, customers, tracking…"
+        placeholder="Search transactions, customers, trackingâ€¦"
         className="df-input py-1.5 pl-9 pr-16 text-xs"
         aria-label="Global search"
       />
@@ -97,9 +101,9 @@ export function GlobalSearch() {
       {open && term.trim().length >= 2 ? (
         <div className="absolute left-0 right-0 top-full z-30 mt-1.5 overflow-hidden rounded-lg border border-ink-200 bg-white shadow-pop animate-slide-up">
           {loading ? (
-            <div className="px-3 py-3 text-xs text-ink-400">Searching…</div>
+            <div className="px-3 py-3 text-xs text-ink-400">Searchingâ€¦</div>
           ) : results.length === 0 ? (
-            <div className="px-3 py-3 text-xs text-ink-400">No matches for “{term}”.</div>
+            <div className="px-3 py-3 text-xs text-ink-400">No matches for â€œ{term}â€.</div>
           ) : (
             <ul className="max-h-80 overflow-y-auto py-1">
               {results.map((result) => (
@@ -113,7 +117,7 @@ export function GlobalSearch() {
                       <p className="truncate font-mono text-xs font-medium text-ink-800">{result.label}</p>
                       <p className="truncate text-2xs text-ink-400">
                         {result.match_type}
-                        {result.customer ? ` · ${result.customer}` : ''}
+                        {result.customer ? ` Â· ${result.customer}` : ''}
                       </p>
                     </div>
                     <StatusBadge
