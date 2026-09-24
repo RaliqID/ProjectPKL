@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import {
   ArrowLeft,
@@ -22,6 +22,7 @@ import { formatDate, formatDateTime, formatIDR } from '@/lib/format'
 import { DELIVERY_STATUS, DOCUMENT_TYPES, INVOICE_STATUS, PAYMENT_METHODS, PAYMENT_STATUS, COURIERS, metaFor, TRANSACTION_STATUS } from '@/lib/status'
 import { ApiError } from '@/lib/api'
 import { useToast } from '@/lib/toast'
+import { reportFailure } from '@/lib/report'
 import { useAuth } from '@/lib/auth'
 import { ActivityTimeline } from '@/features/transactions/ActivityTimeline'
 import { VerificationPanel } from '@/features/transactions/VerificationPanel'
@@ -91,8 +92,8 @@ export function TransactionDetailPage() {
       else if (status === 'WARNING') toast.info('Verification completed with warnings', `Score ${result.data.score}`)
       else toast.error('Verification failed', `${result.data.failed_count} failed check(s)`)
       setTab('verification')
-    } catch {
-      toast.error('Could not run verification')
+    } catch (error) {
+      reportFailure('run verification', error, toast, 'Could not run verification')
     }
   }
 
@@ -106,7 +107,7 @@ export function TransactionDetailPage() {
           </Link>
         }
         title={trx.transaction_code}
-        description={trx.customer?.name ?? '—'}
+        description={trx.customer?.name ?? 'â€”'}
         actions={
           <>
             <StatusBadge label={statusMeta.label} tone={statusMeta.tone} />
@@ -144,7 +145,7 @@ export function TransactionDetailPage() {
             }
           />
           <Field label="Transaction date" value={formatDate(trx.transaction_date)} />
-          <Field label="Purchase order" value={trx.purchase_order_number ?? '—'} />
+          <Field label="Purchase order" value={trx.purchase_order_number ?? 'â€”'} />
         </div>
       </div>
 
@@ -254,11 +255,11 @@ function OverviewTab({
             <h2 className="text-sm font-semibold text-ink-900">Transaction Information</h2>
           </div>
           <dl className="grid grid-cols-2 gap-x-6 gap-y-4 px-5 py-4 text-sm">
-            <Field label="Customer" value={t.customer?.name ?? '—'} />
-            <Field label="Customer code" value={t.customer?.customer_code ?? '—'} />
-            <Field label="Reference" value={t.reference_number ?? '—'} />
-            <Field label="Sales order" value={t.sales_order_number ?? '—'} />
-            <Field label="Created by" value={t.creator_name ?? '—'} />
+            <Field label="Customer" value={t.customer?.name ?? 'â€”'} />
+            <Field label="Customer code" value={t.customer?.customer_code ?? 'â€”'} />
+            <Field label="Reference" value={t.reference_number ?? 'â€”'} />
+            <Field label="Sales order" value={t.sales_order_number ?? 'â€”'} />
+            <Field label="Created by" value={t.creator_name ?? 'â€”'} />
             <Field label="Created" value={formatDateTime(t.created_at)} />
             {t.notes ? (
               <div className="col-span-2">
@@ -409,8 +410,8 @@ function InvoiceTab({ invoices, canWrite, onAdd }: { invoices: NonNullable<Retur
                 <div>
                   <p className="font-mono text-sm font-medium text-ink-900">{inv.invoice_number}</p>
                   <p className="mt-0.5 text-2xs text-ink-400">
-                    Issued {formatDate(inv.invoice_date)} · Due {formatDate(inv.due_date)}
-                    {inv.is_overdue ? <span className="ml-1 font-medium text-bad-600">· {inv.days_overdue}d overdue</span> : null}
+                    Issued {formatDate(inv.invoice_date)} Â· Due {formatDate(inv.due_date)}
+                    {inv.is_overdue ? <span className="ml-1 font-medium text-bad-600">Â· {inv.days_overdue}d overdue</span> : null}
                   </p>
                 </div>
                 <div className="flex items-center gap-6">
@@ -502,8 +503,8 @@ function PaymentRows({ payments, canWrite }: { payments: NonNullable<ReturnType<
       invalidate.transaction(payments[0]?.transaction_id ?? 0)
       invalidate.overview()
       toast.success(`Payment ${action === 'confirm' ? 'confirmed' : 'rejected'}`)
-    } catch {
-      toast.error('Could not update payment')
+    } catch (error) {
+      reportFailure('update payment', error, toast, 'Could not update payment')
     }
   }
 
@@ -516,7 +517,7 @@ function PaymentRows({ payments, canWrite }: { payments: NonNullable<ReturnType<
             <div>
               <p className="font-mono text-xs font-medium text-ink-800">{p.payment_reference ?? `PAY-${p.id}`}</p>
               <p className="mt-0.5 text-2xs text-ink-400">
-                {formatDate(p.payment_date)} · {p.method_label}
+                {formatDate(p.payment_date)} Â· {p.method_label}
               </p>
             </div>
             <div className="flex items-center gap-4">
@@ -598,8 +599,8 @@ function DeliveryTab({ trx, canWrite, onAdd }: { trx: NonNullable<ReturnType<typ
                     <div>
                       <p className="font-mono text-xs font-medium text-ink-800">{d.delivery_number ?? `DO-${d.id}`}</p>
                       <p className="mt-0.5 text-2xs text-ink-400">
-                        {d.courier} · {d.tracking_number ?? 'no tracking'}
-                        {d.is_delayed ? <span className="ml-1 font-medium text-bad-600">· delayed</span> : null}
+                        {d.courier} Â· {d.tracking_number ?? 'no tracking'}
+                        {d.is_delayed ? <span className="ml-1 font-medium text-bad-600">Â· delayed</span> : null}
                       </p>
                     </div>
                     <div className="flex items-center gap-3">
@@ -615,7 +616,7 @@ function DeliveryTab({ trx, canWrite, onAdd }: { trx: NonNullable<ReturnType<typ
                     <Field label="Shipped" value={formatDate(d.shipping_date)} />
                     <Field label="ETA" value={formatDate(d.estimated_delivery_date)} />
                     <Field label="Delivered" value={formatDate(d.delivered_at)} />
-                    <Field label="Recipient" value={d.recipient_name ?? '—'} />
+                    <Field label="Recipient" value={d.recipient_name ?? 'â€”'} />
                   </dl>
                 </li>
               )
@@ -672,7 +673,7 @@ function StatusModal({ open, onClose, trx, isAdmin }: { open: boolean; onClose: 
         <Select
           label="New status"
           required
-          placeholder="Select a status…"
+          placeholder="Select a statusâ€¦"
           options={trx.allowed_transitions.map((t) => ({ value: t.value, label: t.label }))}
           value={status}
           onChange={(e) => setStatus(e.target.value)}
@@ -744,7 +745,7 @@ function InvoiceModal({ open, onClose, transactionId }: { open: boolean; onClose
       }
     >
       <div className="space-y-4">
-        <TextInput label="Invoice number" required value={form.invoice_number} onChange={(e) => set('invoice_number', e.target.value)} error={errors.invoice_number} placeholder="INV-…" />
+        <TextInput label="Invoice number" required value={form.invoice_number} onChange={(e) => set('invoice_number', e.target.value)} error={errors.invoice_number} placeholder="INV-â€¦" />
         <div className="grid grid-cols-2 gap-4">
           <TextInput label="Invoice date" type="date" value={form.invoice_date} onChange={(e) => set('invoice_date', e.target.value)} error={errors.invoice_date} />
           <TextInput label="Due date" type="date" value={form.due_date} onChange={(e) => set('due_date', e.target.value)} error={errors.due_date} />
@@ -829,7 +830,7 @@ function PaymentModal({ open, onClose, trx }: { open: boolean; onClose: () => vo
             error={errors.status}
           />
         </div>
-        <TextInput label="Reference" value={form.payment_reference} onChange={(e) => set('payment_reference', e.target.value)} error={errors.payment_reference} placeholder="PAY-…" />
+        <TextInput label="Reference" value={form.payment_reference} onChange={(e) => set('payment_reference', e.target.value)} error={errors.payment_reference} placeholder="PAY-â€¦" />
         <Textarea label="Notes" value={form.notes} onChange={(e) => set('notes', e.target.value)} />
       </div>
     </Modal>

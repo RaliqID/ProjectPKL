@@ -96,7 +96,29 @@ export function DataTable<T>({
             {rows.map((row) => (
               <tr
                 key={rowKey(row)}
-                onClick={onRowClick ? () => onRowClick(row) : undefined}
+                onClick={
+                  onRowClick
+                    ? (event) => {
+                        /*
+                         * A cell can opt out of opening the row.
+                         *
+                         * The action cell needs this: pressing "Confirm" must not
+                         * also navigate. Expressing that as `onClick` on a wrapper
+                         * div made the cell look interactive to a screen reader
+                         * while being unreachable by keyboard, which is the worst
+                         * of both.
+                         *
+                         * The opt-out is declared as data, and the handler checks
+                         * whether the event started inside an element carrying it.
+                         * The wrapper stays a plain div, so nothing advertises an
+                         * affordance it does not have.
+                         */
+                        const origin = event.target as HTMLElement | null
+                        if (origin?.closest('[data-row-click-stop]')) return
+                        onRowClick(row)
+                      }
+                    : undefined
+                }
                 onKeyDown={
                   onRowClick
                     ? (e) => {

@@ -82,7 +82,16 @@ export function PaymentsPage() {
       align: 'right',
       render: (p) =>
         p.status === 'PENDING' ? (
-          <div className="flex justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
+          /*
+            `role="presentation"` with a click handler is a contradiction: the
+            handler existed only to stop a row click from firing when a button
+            inside the cell was pressed. That is a layout concern, not an
+            interaction, and expressing it as an interactive element makes the
+            cell reachable by a screen reader and unreachable by a keyboard.
+            The row-click suppression now lives on the cell wrapper below, where
+            the semantics are honest.
+          */
+          <div className="flex justify-end gap-1.5" data-row-click-stop>
             <Button variant="secondary" className="px-2 py-1 text-2xs" onClick={() => act(p.id, 'confirm')}>
               Confirm
             </Button>
@@ -91,7 +100,9 @@ export function PaymentsPage() {
             </Button>
           </div>
         ) : (
-          <span className="text-2xs text-ink-300">—</span>
+          <span className="text-2xs text-ink-300" aria-hidden>
+            &mdash;
+          </span>
         ),
     },
   ]

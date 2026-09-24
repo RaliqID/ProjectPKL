@@ -13,11 +13,34 @@ export class ApiError extends Error {
   status: number
   errors: Record<string, string[]>
 
-  constructor(status: number, message: string, errors: Record<string, string[]> = {}) {
+  constructor(
+    status: number,
+    message: string,
+    errors: Record<string, string[]> = {},
+    /**
+     * The failure that caused this one, when there was one.
+     *
+     * A network error has no status to inspect, so the original rejection is the
+     * only clue about what actually went wrong. Kept rather than swallowed.
+     */
+    options?: { cause?: unknown },
+  ) {
     super(message)
     this.name = 'ApiError'
     this.status = status
     this.errors = errors
+
+    /*
+     * `Error.cause` is assigned rather than passed to `super`.
+     *
+     * The two-argument `Error` constructor needs a lib target that this project
+     * does not set, and the assignment is equivalent at runtime on every engine
+     * that supports `cause` at all. The property is declared on the class so the
+     * type is available regardless of lib.
+     */
+    if (options?.cause !== undefined) {
+      ;(this as Error & { cause?: unknown }).cause = options.cause
+    }
   }
 }
 
@@ -80,8 +103,12 @@ async function request<T>(method: string, url: string, body?: unknown): Promise<
             ? body
             : JSON.stringify(body),
     })
-  } catch {
-    throw new ApiError(0, 'Network error. Please check your connection and try again.')
+  } catch (cause) {
+    // The underlying failure is carried on the error rather than discarded:
+    // `fetch` rejects for DNS problems, refused connections, aborted requests
+    // and CORS, and those need different responses. Without the cause they are
+    // indistinguishable in a log.
+    throw new ApiError(0, 'Network error. Please check your connection and try again.', {}, { cause })
   }
 
   if (response.status === 204) {

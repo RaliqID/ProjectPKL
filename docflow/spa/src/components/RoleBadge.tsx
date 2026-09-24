@@ -31,8 +31,21 @@ export function RoleBadge() {
         type="button"
         onClick={() => setOpen((v) => !v)}
         className="inline-flex items-center gap-1.5 rounded-md border border-ink-200 bg-white px-2.5 py-1.5 text-2xs font-medium text-ink-600 transition-colors hover:border-ink-300 hover:text-ink-800"
-        aria-haspopup="dialog"
+        /*
+         * A disclosure, not a dialog.
+         *
+         * It was marked `aria-haspopup="dialog"` with `role="dialog"` inside,
+         * which promises behaviour the component does not provide: no focus
+         * trap, no inert background, Escape did nothing. A screen reader then
+         * tells the user they are in a modal when they are not.
+         *
+         * What it actually is: a button that reveals a panel of static text.
+         * `aria-expanded` plus `aria-controls` describes that exactly, and
+         * `aria-describedby` points at the panel so its content is read as a
+         * description of the button.
+         */
         aria-expanded={open}
+        aria-controls={open ? 'role-panel' : undefined}
         title={meta.summary}
       >
         <ShieldCheck className="h-3.5 w-3.5 text-ink-400" />
@@ -42,8 +55,14 @@ export function RoleBadge() {
 
       {open ? (
         <div
-          role="dialog"
-          aria-label="Your role and permissions"
+          id="role-panel"
+          /*
+           * Escape closes it. Previously only a click outside did, so a keyboard
+           * user who opened the panel could only dismiss it by tabbing away.
+           */
+          onKeyDown={(event) => {
+            if (event.key === 'Escape') setOpen(false)
+          }}
           className="absolute right-0 top-full z-40 mt-1.5 w-80 max-w-[calc(100vw-2rem)] rounded-lg border border-ink-200 bg-white p-4 shadow-pop animate-slide-up"
         >
           <div className="flex items-center gap-2">

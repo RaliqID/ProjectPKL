@@ -14,3 +14,12 @@ npm-debug.log*
 
 # TS build info
 *.tsbuildinfo
+
+# TypeScript build artefacts.
+#
+# The SPA is a Vite app: it consumes .ts directly and never loads emitted .js.
+# A stray `vite.config.js` would be resolved *before* `vite.config.ts`, so the
+# generated file would silently win over the one being edited.
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts

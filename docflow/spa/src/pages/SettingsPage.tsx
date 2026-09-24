@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Save } from 'lucide-react'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Button } from '@/components/ui/Button'
@@ -50,29 +50,73 @@ export function SettingsPage() {
   )
 }
 
+/**
+ * Required documents, split into a loader and an editor.
+ *
+ * The previous version held the server's rules in `useState` and copied them in
+ * with an effect that ran whenever `data` changed. That pattern has two costs:
+ *
+ *   - The copy can fall behind the source. After a save the query refetches, the
+ *     effect runs again, and any edit made in between is silently discarded.
+ *   - It renders twice on every load: once with empty rules, once with the real
+ *     ones, so the table flashes.
+ *
+ * Deriving the initial value during render and remounting the editor with a
+ * `key` removes both. React resets the state itself, and the reset point is
+ * explicit rather than hidden in a dependency array.
+ *
+ * The API sends the rules and the list of document types as two separate arrays,
+ * keyed differently (`document_type` versus `value`). They are joined here once,
+ * so the editor receives a single shape and cannot mix the two up.
+ */
 function RequiredDocumentsTab() {
   const { data, isLoading, error, refetch } = useSettings()
-  const update = useUpdateRequiredDocuments()
-  const toast = useToast()
-  const [rules, setRules] = useState<Record<string, { is_required: boolean; is_active: boolean }>>({})
-
-  useEffect(() => {
-    if (data) {
-      const initial: Record<string, { is_required: boolean; is_active: boolean }> = {}
-      data.required_documents.forEach((r) => {
-        initial[r.document_type] = { is_required: r.is_required, is_active: r.is_active }
-      })
-      setRules(initial)
-    }
-  }, [data])
 
   if (isLoading) return <Skeleton className="h-64" />
-  if (error || !data)
+
+  if (error || !data) {
     return (
       <div className="df-card">
         <ErrorState message="Could not load settings." onRetry={() => refetch()} />
       </div>
     )
+  }
+
+  const ruleByType = new Map(data.required_documents.map((r) => [r.document_type, r]))
+
+  const rows = data.available_document_types.map((type) => {
+    const rule = ruleByType.get(type.value)
+    return {
+      value: type.value,
+      label: type.label,
+      is_required: rule?.is_required ?? false,
+      is_active: rule?.is_active ?? true,
+    }
+  })
+
+  return (
+    <RequiredDocumentsEditor
+      // A new key whenever the server sends different values, so the editor
+      // remounts with fresh initial state instead of copying them in.
+      key={rows.map((r) => `${r.value}:${r.is_required}:${r.is_active}`).join('|')}
+      rows={rows}
+    />
+  )
+}
+
+function RequiredDocumentsEditor({
+  rows,
+}: {
+  rows: Array<{ value: string; label: string; is_required: boolean; is_active: boolean }>
+}) {
+  const update = useUpdateRequiredDocuments()
+  const toast = useToast()
+
+  // Seeded once, from props, at mount. The `key` above decides when that
+  // happens; no effect is involved.
+  const [rules, setRules] = useState<Record<string, { is_required: boolean; is_active: boolean }>>(
+    () => Object.fromEntries(rows.map((r) => [r.value, { is_required: r.is_required, is_active: r.is_active }])),
+  )
 
   const save = async () => {
     try {
@@ -106,18 +150,23 @@ function RequiredDocumentsTab() {
             </tr>
           </thead>
           <tbody className="divide-y divide-ink-100">
-            {data.available_document_types.map((type) => {
-              const rule = rules[type.value] ?? { is_required: false, is_active: true }
+            {rows.map((row) => {
+              const rule = rules[row.value] ?? { is_required: false, is_active: true }
               return (
-                <tr key={type.value}>
-                  <td className="px-5 py-3 text-xs text-ink-700">{type.label}</td>
+                <tr key={row.value}>
+                  <td className="px-5 py-3 text-xs text-ink-700">{row.label}</td>
                   <td className="px-5 py-3">
                     <input
                       type="checkbox"
                       checked={rule.is_active}
-                      onChange={(e) => setRules((r) => ({ ...r, [type.value]: { ...rule, is_active: e.target.checked } }))}
+                      onChange={(e) =>
+                        setRules((r) => ({
+                          ...r,
+                          [row.value]: { ...rule, is_active: e.target.checked },
+                        }))
+                      }
                       className="h-4 w-4 rounded border-ink-300 text-accent-600"
-                      aria-label={`${type.label} active`}
+                      aria-label={`${row.label} active`}
                     />
                   </td>
                   <td className="px-5 py-3">
@@ -125,9 +174,14 @@ function RequiredDocumentsTab() {
                       type="checkbox"
                       checked={rule.is_required}
                       disabled={!rule.is_active}
-                      onChange={(e) => setRules((r) => ({ ...r, [type.value]: { ...rule, is_required: e.target.checked } }))}
+                      onChange={(e) =>
+                        setRules((r) => ({
+                          ...r,
+                          [row.value]: { ...rule, is_required: e.target.checked },
+                        }))
+                      }
                       className="h-4 w-4 rounded border-ink-300 text-accent-600 disabled:opacity-40"
-                      aria-label={`${type.label} required`}
+                      aria-label={`${row.label} required`}
                     />
                   </td>
                 </tr>
@@ -277,7 +331,22 @@ function UsersTab() {
           </table>
         )}
       </div>
-      <UserModal open={modalOpen} onClose={() => setModalOpen(false)} editing={editing} />
+      <UserModal
+        /*
+         * `key` remounts the modal whenever the target user changes, or the
+         * modal is reopened. The form seeds itself from `editing` during render,
+         * so the reset is React's own rather than an effect that has to notice
+         * the change.
+         *
+         * The previous version reset via an effect keyed on `[editing, open]`.
+         * It worked, but it rendered the empty form first and then the filled
+         * one, so opening "Edit" on an existing user flashed a blank form.
+         */
+        key={editing ? `edit-${editing.id}` : `create-${modalOpen}`}
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        editing={editing}
+      />
     </div>
   )
 }
@@ -294,14 +363,24 @@ function UserModal({
   const toast = useToast()
   const createUser = useCreateUser()
   const updateUser = useUpdateUser()
-  const [form, setForm] = useState({ name: '', email: '', password: '', role: 'OPERATOR', is_active: true })
-  const [errors, setErrors] = useState<Record<string, string[]>>({})
 
-  useEffect(() => {
-    if (editing) setForm({ name: editing.name, email: editing.email, password: '', role: editing.role, is_active: editing.is_active })
-    else setForm({ name: '', email: '', password: '', role: 'OPERATOR', is_active: true })
-    setErrors({})
-  }, [editing, open])
+  /**
+   * Seeded during render, from the prop, at mount.
+   *
+   * The `key` on the caller decides when the modal is a fresh instance, which is
+   * what makes this an initial value rather than a value that needs syncing.
+   * `errors` keeps the same treatment, so reopening always starts clean.
+   */
+  const [form, setForm] = useState(() => ({
+    name: editing?.name ?? '',
+    email: editing?.email ?? '',
+    // Never pre-filled: a password field that arrives populated invites an
+    // accidental overwrite.
+    password: '',
+    role: editing?.role ?? 'OPERATOR',
+    is_active: editing?.is_active ?? true,
+  }))
+  const [errors, setErrors] = useState<Record<string, string[]>>({})
 
   const set = (k: keyof typeof form, v: string | boolean) => setForm((f) => ({ ...f, [k]: v }))
 
