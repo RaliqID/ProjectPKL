@@ -76,6 +76,56 @@
     @apply sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-50
       focus:rounded-md focus:bg-accent-600 focus:px-3 focus:py-2 focus:text-white;
   }
+
+  /*
+   * Heading scale for the marketing page.
+   *
+   * Tracking is set per size rather than globally: large type needs negative
+   * tracking to stop looking loose, and applying one value everywhere makes
+   * either the headings cramped or the body airy. Fraunces also sits slightly
+   * wide at display sizes, so the correction matters more here than it would
+   * with a neutral sans.
+   *
+   * Sizes use clamp with a viewport term. In the hero the headline sits in a
+   * five-of-twelve column, which at 1440px is about 416px wide. A fixed 4rem
+   * there wrapped "one source of operational context" onto three lines and left
+   * nothing balanced; scaling with the viewport keeps the two-line break while
+   * still growing on wide screens.
+   */
+  .df-display-1 {
+    @apply font-display leading-[1.06] tracking-[-0.025em] text-ink-900;
+    font-size: clamp(2.125rem, 4.2vw, 3.25rem);
+    font-variation-settings: 'SOFT' 0, 'WONK' 1;
+  }
+
+  .df-display-2 {
+    @apply font-display leading-[1.14] tracking-[-0.02em] text-ink-900;
+    font-size: clamp(1.625rem, 2.8vw, 2.25rem);
+    font-variation-settings: 'SOFT' 0, 'WONK' 1;
+  }
+
+  /*
+   * Section label: replaces the uppercase + wide-tracking eyebrow that appeared
+   * above every section.
+   *
+   * That pattern was doing no work: it repeated what the heading beneath it
+   * said, in the same position, on every section. This keeps a small marker for
+   * orientation but drops the shouting: no uppercase, no extreme tracking, and
+   * a rule instead of letterspacing to carry the visual weight.
+   */
+  .df-section-label {
+    @apply inline-flex items-center gap-2.5 text-xs font-semibold text-accent-700;
+  }
+
+  .df-section-label::before {
+    content: '';
+    @apply block h-px w-6 bg-accent-300;
+  }
+
+  /* Hairline rule used to separate marketing sections without boxing each one. */
+  .df-rule {
+    @apply border-t border-ink-200;
+  }
 }
 
 /* Respect reduced-motion preferences. */

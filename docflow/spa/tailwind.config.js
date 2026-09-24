@@ -4,20 +4,26 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Neutral scale — the backbone of the calm, information-dense UI.
+        // Neutral scale (the backbone of the calm, information-dense UI).
+        //
+        // Warm rather than blue-tinted. A pure grey next to white reads as cold
+        // and slightly clinical, which suits a developer tool but not a system
+        // people read documents in all day. The undersides carry a trace of
+        // yellow, which is what gives printed paper its warmth.
         ink: {
-          50: '#f7f8f9',
-          100: '#eef0f2',
-          200: '#dfe3e7',
-          300: '#c7cdd4',
-          400: '#9aa3ae',
-          500: '#6b7480',
-          600: '#4d5561',
-          700: '#3a414b',
-          800: '#262b33',
-          900: '#16191f',
+          50: '#faf9f7',
+          100: '#f3f1ec',
+          200: '#e7e4dd',
+          300: '#d3cfc5',
+          400: '#a8a29a',
+          500: '#78736c',
+          600: '#57534e',
+          700: '#403d39',
+          800: '#292623',
+          900: '#181614',
         },
-        // Single restrained accent (indigo-slate).
+        // Single restrained accent (indigo). Kept as-is: it is used sparingly
+        // for actions, and a hue change here would ripple through the whole app.
         accent: {
           50: '#eef1fb',
           100: '#dde3f7',
@@ -37,7 +43,14 @@ export default {
         info: { 50: '#eff8ff', 100: '#d1e9ff', 200: '#b2ddff', 300: '#84caff', 500: '#2e90fa', 600: '#1570ef', 700: '#175cd3' },
       },
       fontFamily: {
+        // Body stays neutral; the display face carries the brand.
         sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+        // Fraunces for headings only. A serif with real personality reads as
+        // "official record" rather than "SaaS landing page", which is the
+        // product's actual character. Applied via `font-display` on H1/H2, never
+        // on body text: optical sizing and soft terminals hurt small-size
+        // legibility.
+        display: ['Fraunces', 'Georgia', 'Cambria', 'Times New Roman', 'serif'],
         mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
       fontSize: {
@@ -49,8 +62,11 @@ export default {
         lg: '10px',
       },
       boxShadow: {
-        card: '0 1px 2px 0 rgb(16 24 40 / 0.04), 0 1px 3px 0 rgb(16 24 40 / 0.06)',
-        pop: '0 8px 24px -4px rgb(16 24 40 / 0.12), 0 2px 6px -1px rgb(16 24 40 / 0.08)',
+        card: '0 1px 2px 0 rgb(24 22 20 / 0.04), 0 1px 3px 0 rgb(24 22 20 / 0.06)',
+        pop: '0 8px 24px -4px rgb(24 22 20 / 0.12), 0 2px 6px -1px rgb(24 22 20 / 0.08)',
+        // One deeper tier, reserved for the hero artifact so it reads as the
+        // page's focal object rather than another card.
+        lift: '0 24px 48px -12px rgb(24 22 20 / 0.18), 0 8px 16px -8px rgb(24 22 20 / 0.10)',
       },
       keyframes: {
         'fade-in': { from: { opacity: '0' }, to: { opacity: '1' } },
