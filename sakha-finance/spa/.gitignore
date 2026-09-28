@@ -1,6 +1,9 @@
 # Dependencies
 node_modules/
 
+# Vite cache (generated on dev/build)
+.vite/
+
 # Build output (generated into ../public by vite build)
 dist/
 
