@@ -122,12 +122,12 @@ sulit dicari; update berkala.
 ---
 
 ## Slide 11 — Prototype / Usulan Sistem
-**Isi:** DOCFLOW — Overview, Transactions, Documents, Payments, Deliveries, Verification,
+**Isi:** SAKHA Finance Operations — Overview, Transactions, Documents, Payments, Deliveries, Verification,
 Activity. Tampilkan 2–3 screenshot.
 **Visual:** screenshot dashboard + hasil verifikasi.
 
 **Speaker notes:**
-> "Untuk memperjelas usulan saya, saya buat prototype sederhana bernama DOCFLOW. Di sini
+> "Untuk memperjelas usulan saya, saya buat prototype sederhana bernama SAKHA Finance Operations. Di sini
 > ada dashboard yang menunjukkan apa yang perlu ditindak, daftar transaksi, dokumen,
 > payment, pengiriman, dan halaman verifikasi. Contohnya, kalau dokumen wajib tidak ada,
 > sistem menampilkan status Failed dengan alasannya. Prototype ini saya buat sendiri,

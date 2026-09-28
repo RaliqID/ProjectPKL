@@ -1,0 +1,275 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Design tokens — one source of truth for values used across components. */
+    --df-bg: theme('colors.ink.50');
+    --df-surface: #ffffff;
+    --df-border: theme('colors.ink.200');
+    --df-text: theme('colors.ink.900');
+    --df-text-muted: theme('colors.ink.500');
+    --df-accent: theme('colors.accent.600');
+  }
+
+  /*
+   * Dark theme.
+   *
+   * The whole UI is built on the `ink` neutral scale (bg-ink-50, text-ink-900,
+   * border-ink-200, ...). Rather than adding `dark:` variants to hundreds of
+   * elements, we remap the ink scale so the SAME utility classes resolve to
+   * dark values: ink-50 becomes near-black, ink-900 becomes near-white, and the
+   * mid tones become the appropriate darks. This keeps every existing component
+   * correct with zero per-component changes.
+   *
+   * The accent and status hues are brightened a step because the light-mode
+   * shades are too dark to read on a dark surface.
+   */
+  .dark {
+    --df-bg: #12100f;
+    --df-surface: #1c1a18;
+    --df-border: #312d29;
+    --df-text: #f3f1ec;
+    --df-text-muted: #a8a29a;
+    --df-accent: theme('colors.accent.400');
+
+    /* Warm dark neutral scale (mirrors the light one, inverted). */
+    --ink-50: #12100f;
+    --ink-100: #1c1a18;
+    --ink-200: #2c2825;
+    --ink-300: #403b36;
+    --ink-400: #6b655d;
+    --ink-500: #928b82;
+    --ink-600: #b8b1a7;
+    --ink-700: #d3cfc5;
+    --ink-800: #e7e4dd;
+    --ink-900: #f5f3ef;
+
+    /* Brand accent, brightened for contrast on dark. */
+    --accent-50: #2a1517;
+    --accent-100: #3d1c1f;
+    --accent-200: #5c262a;
+    --accent-300: #8a3a40;
+    --accent-400: #c5666d;
+    --accent-500: #d9888e;
+    --accent-600: #e5a9ad;
+    --accent-700: #f0c6c9;
+
+    /* Status tints, darkened so text-on-tint stays legible. */
+    --ok-50: #0d2818;
+    --ok-100: #103a23;
+    --ok-200: #175c37;
+    --warn-50: #2a1f08;
+    --warn-100: #3d2c0b;
+    --warn-200: #5c4310;
+    --bad-50: #2a1310;
+    --bad-100: #3d1a15;
+    --bad-200: #5c2820;
+    --info-50: #0d1f30;
+    --info-100: #102e46;
+    --info-200: #17456a;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-ink-50 text-ink-900 font-sans text-sm antialiased;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+
+  /* Visible, consistent focus ring for keyboard users everywhere. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-accent-400 ring-offset-1 ring-offset-white;
+  }
+
+  .dark :focus-visible {
+    @apply ring-offset-ink-100;
+  }
+
+  /* Slimmer, calmer scrollbars in scrollable panels. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: theme('colors.ink.300') transparent;
+  }
+
+  /*
+   * Surface sweep for dark mode.
+   *
+   * Components use `bg-white` in ~30 places for cards, panels, popovers and
+   * inputs. Rather than adding a `dark:` variant to each, this raises the
+   * specificity and remaps the utility under `.dark` to the dark surface token.
+   * Same class name, theme-correct result, one place to maintain.
+   */
+  .dark .bg-white {
+    background-color: var(--df-surface);
+  }
+
+  /* The app shell's translucent bars need an opaque dark backing. */
+  .dark .bg-white\/95 {
+    background-color: rgb(28 26 24 / 0.95);
+  }
+  .dark .bg-white\/90 {
+    background-color: rgb(28 26 24 / 0.9);
+  }
+}
+
+@layer components {
+  .df-card {
+    @apply rounded-lg border border-ink-200 bg-[var(--df-surface)] shadow-card;
+  }
+
+  .df-input {
+    @apply w-full rounded-md border border-ink-300 bg-[var(--df-surface)] px-3 py-2 text-sm text-ink-900
+      placeholder:text-ink-400 focus:border-accent-500 focus:outline-none focus:ring-2
+      focus:ring-accent-100 disabled:bg-ink-50 disabled:text-ink-400;
+  }
+
+  .df-label {
+    @apply mb-1.5 block text-xs font-medium text-ink-600;
+  }
+
+  .df-btn {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium
+      transition-colors disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .df-btn-primary {
+    @apply df-btn bg-accent-600 text-white hover:bg-accent-700 active:bg-accent-800;
+  }
+
+  /*
+   * In dark mode the accent scale is brightened for text-on-dark use, so
+   * `bg-accent-600` would be a light pink and white label text would fail
+   * contrast. Pin the primary button to a solid mid-red with white text so it
+   * stays a legible, obviously-clickable action in both themes.
+   */
+  .dark .df-btn-primary {
+    background-color: #a83a42;
+    color: #ffffff;
+  }
+  .dark .df-btn-primary:hover {
+    background-color: #8f1d24;
+  }
+  .dark .df-btn-primary:active {
+    background-color: #771a20;
+  }
+
+  .df-btn-secondary {
+    @apply df-btn border border-ink-300 bg-[var(--df-surface)] text-ink-700 hover:bg-ink-50 hover:text-ink-900;
+  }
+
+  .df-btn-ghost {
+    @apply df-btn text-ink-600 hover:bg-ink-100 hover:text-ink-900;
+  }
+
+  .df-btn-danger {
+    @apply df-btn border border-bad-200 bg-[var(--df-surface)] text-bad-700 hover:bg-bad-50;
+  }
+
+  /* Keyboard-only skip link for accessibility. */
+  .df-skip-link {
+    @apply sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-50
+      focus:rounded-md focus:bg-accent-600 focus:px-3 focus:py-2 focus:text-white;
+  }
+
+  /*
+   * Heading scale.
+   *
+   * A single sans is used for both headings and body, so hierarchy comes from
+   * size and weight rather than a typeface change. Tracking is set per size:
+   * large type needs negative tracking to stop looking loose.
+   *
+   * Sizes use clamp with a viewport term so the hero stays balanced in its
+   * column on narrow screens without wrapping awkwardly.
+   */
+  .df-display-1 {
+    @apply font-display font-semibold leading-[1.08] tracking-[-0.03em] text-ink-900;
+    font-size: clamp(1.875rem, 3.6vw, 2.75rem);
+  }
+
+  .df-display-2 {
+    @apply font-display font-semibold leading-[1.16] tracking-[-0.02em] text-ink-900;
+    font-size: clamp(1.375rem, 2.2vw, 1.75rem);
+  }
+
+  /*
+   * Section label: replaces the uppercase + wide-tracking eyebrow that appeared
+   * above every section.
+   *
+   * That pattern was doing no work: it repeated what the heading beneath it
+   * said, in the same position, on every section. This keeps a small marker for
+   * orientation but drops the shouting: no uppercase, no extreme tracking, and
+   * a rule instead of letterspacing to carry the visual weight.
+   */
+  .df-section-label {
+    @apply inline-flex items-center gap-2.5 text-xs font-semibold text-accent-700;
+  }
+
+  .df-section-label::before {
+    content: '';
+    @apply block h-px w-6 bg-accent-300;
+  }
+
+  /* Hairline rule used to separate marketing sections without boxing each one. */
+  .df-rule {
+    @apply border-t border-ink-200;
+  }
+}
+
+/* Respect reduced-motion preferences. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/*
+ * Print styles — "Cetak / PDF".
+ *
+ * The app is a dense workspace; a printed report should be just the data. We
+ * hide everything marked `data-print="hide"` (the sidebar, search bar, action
+ * buttons, filters) and let the main content flow. Colours are forced to black
+ * on white because a red-tinted table wastes ink and reads poorly on paper.
+ */
+@media print {
+  [data-print='hide'],
+  nav,
+  aside,
+  header {
+    display: none !important;
+  }
+
+  body {
+    background: #fff !important;
+  }
+
+  main,
+  .df-card {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+  }
+
+  .df-card {
+    break-inside: avoid;
+  }
+
+  table {
+    font-size: 10px;
+  }
+
+  a[href]::after {
+    content: '';
+  }
+
+  @page {
+    margin: 14mm;
+  }
+}

@@ -1,4 +1,4 @@
-# 07 — PROTOTYPE (DOCFLOW)
+# 07 — PROTOTYPE (SAKHA Finance Operations)
 
 > **Label: PROPOSED.** Ini prototype yang saya bangun sebagai gambaran usulan.
 > **Bukan** sistem perusahaan, pakai data fiktif, tidak dipakai production.
@@ -115,7 +115,7 @@ password + konfirmasi, pilih role Operator/Reviewer). Akun **tidak bisa**
 menunjuk dirinya sebagai ADMIN — hanya admin yang boleh memberikan role itu.
 Setelah daftar, langsung login otomatis.
 
-**Realtime** — DOCFLOW tidak memakai websocket, tapi data yang paling sering berubah
+**Realtime** — SAKHA Finance Operations tidak memakai websocket, tapi data yang paling sering berubah
 (overview, verification queue, activity) di-*poll* berkala lewat React Query.
 Indikator di topbar menunjukkan **"Live · Ns ago"** yang benar-benar menghitung
 waktu sejak refresh terakhir, dan bisa diklik untuk refresh manual.
@@ -194,7 +194,7 @@ Semua nama customer, nomor invoice, dan nomor resi **fiktif**.
 ## 7. Cara Menjalankan
 
 ```powershell
-cd C:\Users\raso8\ProjectPKL\docflow
+cd C:\Users\raso8\ProjectPKL\sakha-finance
 .\dev.ps1 up
 ```
 Buka `http://127.0.0.1:8650` (port dicatat di `.devport`).
@@ -204,9 +204,9 @@ Buka `http://127.0.0.1:8650` (port dicatat di `.devport`).
 - `/app` → aplikasi (butuh login)
 
 **Akun demo** (semua password: `password`):
-- `admin@docflow.test` — ADMIN
-- `operator@docflow.test` — OPERATOR
-- `reviewer@docflow.test` — REVIEWER
+- `admin@sakha-finance.test` — ADMIN
+- `operator@sakha-finance.test` — OPERATOR
+- `reviewer@sakha-finance.test` — REVIEWER
 
 ---
 

@@ -3,7 +3,7 @@
 > **Label: PROPOSED.** Semua di dokumen ini adalah usulan saya. Belum diterapkan perusahaan.
 
 Dibagi dua: **Quick Wins** (bisa dilakukan manual tanpa aplikasi baru) dan
-**System Improvement** (butuh sistem seperti DOCFLOW).
+**System Improvement** (butuh sistem seperti SAKHA Finance Operations).
 
 ---
 
@@ -51,7 +51,7 @@ Tujuan: semua orang mencari di tempat yang sama, mengikuti tahun lalu jenis.
 [ ] Nama file sesuai standar
 [ ] Folder penyimpanan benar
 ```
-Checklist ini juga menjadi dasar verifikasi di DOCFLOW.
+Checklist ini juga menjadi dasar verifikasi di SAKHA Finance Operations.
 
 ### A4. Aturan "rename segera setelah unduh/scan"
 Jangan menunda rename — file default cepat menumpuk dan sulit dibedakan.
@@ -60,7 +60,7 @@ Jangan menunda rename — file default cepat menumpuk dan sulit dibedakan.
 
 ## B. SYSTEM IMPROVEMENT (PROPOSED)
 
-### B1. Document & Transaction Monitoring System (DOCFLOW)
+### B1. Document & Transaction Monitoring System (SAKHA Finance Operations)
 Sebuah pusat data operasional dengan konsep:
 
 > **Satu transaksi = satu konteks.**

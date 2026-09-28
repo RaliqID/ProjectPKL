@@ -58,7 +58,7 @@ Sulit melihat sekilas transaksi mana yang sudah selesai dan mana yang masih tert
 |---|---|
 | P3 penamaan file | Standardisasi nama file `YYYY-MM-DD_CUSTOMER_JENIS_NOMOR` |
 | P4 pencarian dokumen | Struktur folder tahun → jenis + satu sumber data |
-| P1 data tersebar | Satu pusat data (DOCFLOW) sebagai *single source* |
+| P1 data tersebar | Satu pusat data (SAKHA Finance Operations) sebagai *single source* |
 | P2 & P5 verifikasi manual | Verification engine deterministik + checklist |
 | P6 update berkala | Attention queue yang otomatis menandai hal yang perlu ditindak |
 | P7 human error | Validasi server-side + alasan peringatan yang jelas |

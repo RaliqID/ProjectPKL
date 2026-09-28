@@ -6,7 +6,7 @@
 
 ## 1. Nama & Tujuan
 
-**DOCFLOW — Document & Transaction Operations Management System**
+**SAKHA Finance Operations — Sistem Informasi Pengelolaan Data dan Dokumen Finance**
 
 Tujuan: memusatkan transaksi, invoice, payment, pengiriman, dokumen, verifikasi, dan
 riwayat ke satu alur yang bisa ditelusuri — supaya data tidak tersebar dan status tidak kabur.
@@ -159,5 +159,5 @@ GET    /api/reports                   GET    /api/users          GET /api/settin
 - Sanitasi nama file, cegah path traversal.
 - Path filesystem **tidak** pernah diekspos ke client (download lewat controller ter-otorisasi).
 
-> Semua di atas adalah **rancangan**. Prototype DOCFLOW mengimplementasikannya, tetapi
+> Semua di atas adalah **rancangan**. Prototype SAKHA Finance Operations mengimplementasikannya, tetapi
 > sistem ini **bukan** produk perusahaan.

@@ -1,13 +1,17 @@
-# ProjectPKL — DOCFLOW
+# ProjectPKL — SAKHA FINANCE OPERATIONS
 
-**Analisis workflow PKL + prototype sistem operasional dokumen & transaksi.**
+**Analisis workflow PKL + prototype Sistem Informasi Pengelolaan Data dan Dokumen Finance.**
 
 Repo ini berisi dua hal:
 
 1. **`docs/`** — dokumentasi case study PKL (jobdesk, workflow, masalah, improvement,
    usulan sistem, presentasi, Q&A sidang, audit kejujuran).
-2. **`docflow/`** — aplikasi full-stack yang **benar-benar jalan** (Laravel + PostgreSQL +
-   React/TypeScript), sebagai prototype usulan. **Bukan sistem perusahaan, pakai data fiktif.**
+2. **`sakha-finance/`** — aplikasi full-stack yang **benar-benar jalan** (Laravel + PostgreSQL +
+   React/TypeScript), sebagai prototype usulan. **Bukan sistem produksi resmi perusahaan, memakai data fiktif.**
+
+> **Konteks resmi:** "Sistem Informasi Pengelolaan Data dan Dokumen Finance" — prototype yang
+> dikembangkan berdasarkan kegiatan PKL di **PT. Sakha Internasional**. Bukan sistem internal
+> produksi milik perusahaan, dan tidak memuat data perusahaan.
 
 ---
 
@@ -16,18 +20,22 @@ Repo ini berisi dua hal:
 Prasyarat: PHP 8.3+, Composer, Node 18+, PostgreSQL (sudah ada cluster lokal).
 
 ```powershell
-cd docflow
-.\dev.ps1 up          # menyalakan PostgreSQL + Laravel API pada port bebas (8650-8699)
+cd sakha-finance
+.\run.cmd              # cara termudah: klik dua kali run.cmd di Explorer
+# atau dari terminal:
+.\dev.ps1 up           # menyalakan PostgreSQL + Laravel API pada port bebas (8650-8699)
+.\start-all.ps1        # PostgreSQL + API + queue worker + Vite SPA
 ```
 
-Buka **http://127.0.0.1:8650** (port tercatat di `docflow/.devport`).
+Buka **http://127.0.0.1:8650** (port tercatat di `sakha-finance/.devport`), atau Vite dev di
+**http://127.0.0.1:5173** jika memakai `start-all.ps1`.
 
 **Akun demo** (password: `password`):
-| Email | Role |
+| Email | Peran |
 |---|---|
-| `admin@docflow.test` | ADMIN |
-| `operator@docflow.test` | OPERATOR |
-| `reviewer@docflow.test` | REVIEWER |
+| `admin@sakha.test` | Administrator |
+| `operator@sakha.test` | Operator |
+| `reviewer@sakha.test` | Pemeriksa |
 
 ### Perintah lain
 ```powershell
@@ -38,21 +46,22 @@ Buka **http://127.0.0.1:8650** (port tercatat di `docflow/.devport`).
 
 ### Reset data contoh
 ```powershell
-cd docflow
+cd sakha-finance
 php artisan migrate:fresh --seed
+php artisan sakha:regenerate-documents   # regenerasi berkas PDF contoh
 ```
 
 ### Test backend
 ```powershell
-cd docflow
-php artisan test      # 45 test, 130 assertion
+cd sakha-finance
+php artisan test      # 51 test, 152 assertion
 ```
 
 ### Build frontend (setelah ubah React)
 ```powershell
-cd docflow\spa
+cd sakha-finance\spa
 npm install
-npm run build         # hasil ke docflow/public
+npm run build         # hasil ke sakha-finance/public
 ```
 
 ---
@@ -73,13 +82,18 @@ ProjectPKL/
 │   ├── 09_QA_SIDANG.md
 │   ├── 11_FINAL_REVIEW.md
 │   └── diagrams/
-└── docflow/                      # aplikasi prototype
+└── sakha-finance/                # aplikasi prototype
     ├── app/                      # Laravel (services, models, api)
     ├── database/                 # migrasi + seeder (data fiktif)
     ├── spa/                      # React + TypeScript + Tailwind
-    ├── dev.ps1 / run-lib.ps1     # kontrol dev stack
+    ├── dev.ps1 / run.cmd         # kontrol dev stack
     └── public/                   # hasil build SPA
 ```
+
+## Modul
+
+Beranda · Transaksi · Invoice · Pembayaran · Pengiriman · Dokumen · Arsip ·
+Verifikasi · Pemeriksaan Ketelitian · Pengeluaran · Pengadaan · Pelanggan · Aktivitas · Pengaturan
 
 ---
 

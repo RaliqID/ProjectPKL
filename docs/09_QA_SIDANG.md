@@ -73,7 +73,7 @@
 
 **11. Apa improvement yang kamu usulkan?**
 - *Pendek:* Standardisasi file, struktur folder, checklist, dan sistem monitoring.
-- *Lengkap:* Quick wins (nama file, folder, checklist) plus usulan sistem DOCFLOW untuk
+- *Lengkap:* Quick wins (nama file, folder, checklist) plus usulan sistem SAKHA Finance Operations untuk
   memusatkan transaksi, dokumen, payment, pengiriman, dan verifikasi.
 - *Ingat:* Pisahkan "bisa langsung" vs "butuh sistem".
 
@@ -85,14 +85,14 @@
 
 **13. Apakah sistem itu sudah dipakai perusahaan?**
 - *Pendek:* Belum. Ini usulan.
-- *Lengkap:* Belum. DOCFLOW adalah prototype usulan saya berdasarkan proses yang saya
+- *Lengkap:* Belum. SAKHA Finance Operations adalah prototype usulan saya berdasarkan proses yang saya
   temui selama PKL. Perusahaan belum menerapkannya.
 - *Ingat:* **Jawaban ini wajib tegas: Belum.**
 
 **14. Apa perbedaan pekerjaan nyata dengan prototype?**
 - *Pendek:* Pekerjaan nyata = manual pakai tools yang ada; prototype = usulan yang saya bangun.
 - *Lengkap:* Pekerjaan nyata saya lakukan manual dengan Accurate, Excel, marketplace,
-  WhatsApp, dan File Explorer. Prototype DOCFLOW adalah usulan saya sendiri, pakai data
+  WhatsApp, dan File Explorer. Prototype SAKHA Finance Operations adalah usulan saya sendiri, pakai data
   contoh, dan tujuannya hanya memvisualisasikan perbaikan.
 - *Ingat:* ACTUAL vs PROPOSED.
 

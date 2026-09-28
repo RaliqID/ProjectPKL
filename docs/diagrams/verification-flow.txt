@@ -1,4 +1,4 @@
-VERIFICATION FLOW (PROPOSED — DOCFLOW, deterministik)
+VERIFICATION FLOW (PROPOSED — SAKHA Finance Operations, deterministik)
 
   User klik "Run Verification"
             |

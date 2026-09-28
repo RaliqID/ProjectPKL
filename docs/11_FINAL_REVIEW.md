@@ -22,7 +22,7 @@
 | Mengarang masalah perusahaan | ❌ Tidak — kendala diberi label OBSERVATION |
 | Mengarang jumlah transaksi/customer | ❌ Tidak — angka hanya ada pada **data seed fiktif** |
 | Mengarang dampak finansial | ❌ Tidak — tidak ada angka biaya/kerugian |
-| Mengklaim membuat aplikasi perusahaan | ❌ Tidak — DOCFLOW = prototype independen |
+| Mengklaim membuat aplikasi perusahaan | ❌ Tidak — SAKHA Finance Operations = prototype independen |
 | Mengklaim automation/AI | ❌ Tidak — verifikasi **deterministik**, dinyatakan berulang |
 | Mengklaim improvement sudah diterapkan | ❌ Tidak — selalu "usulan/belum diterapkan" |
 
@@ -34,14 +34,14 @@
 |---|---|---|
 | 01 Project Overview | ACTUAL + OBSERVATION + PROPOSED (dilabeli) | ✅ |
 | 02 Jobdesk Analysis (A–AC) | ACTUAL | ✅ |
-| 03 Workflow (WF-1..WF-8) | ACTUAL; pemetaan ke DOCFLOW = PROPOSED | ✅ |
+| 03 Workflow (WF-1..WF-8) | ACTUAL; pemetaan ke SAKHA Finance Operations = PROPOSED | ✅ |
 | 04 Problem Analysis | OBSERVATION | ✅ |
 | 05 Improvement | PROPOSED | ✅ |
 | 06 System Proposal | PROPOSED | ✅ |
 | 07 Prototype | PROPOSED (dinyatakan "bukan sistem perusahaan") | ✅ |
 | 08 Presentation | Notes jujur; ada pengingat "Belum" | ✅ |
 | 09 Q&A | Jawaban jujur; Q13 = "Belum" | ✅ |
-| Aplikasi DOCFLOW | Prototype, data fiktif, disclaimer di UI & login | ✅ |
+| Aplikasi SAKHA Finance Operations | Prototype, data fiktif, disclaimer di UI & login | ✅ |
 
 ---
 
@@ -61,7 +61,7 @@
 | "Ini kamu benar-benar kerjakan?" | "Ya — pekerjaan operasionalnya saya kerjakan langsung, prototype-nya juga saya buat sendiri." |
 | "Ini sudah dipakai perusahaan?" | "Belum. Ini usulan pengembangan berdasarkan proses yang saya temui selama PKL." |
 | "Berapa transaksi/customer perusahaan?" | "Saya tidak mengukurnya, jadi saya tidak menyebut angka." |
-| "Ini aplikasi buatan kamu?" | "DOCFLOW adalah prototype usulan saya. Bukan sistem yang dipakai perusahaan." |
+| "Ini aplikasi buatan kamu?" | "SAKHA Finance Operations adalah prototype usulan saya. Bukan sistem yang dipakai perusahaan." |
 | "Verifikasinya pakai AI?" | "Tidak. Deterministik — aturannya jelas dan hasilnya bisa dijelaskan." |
 
 ---

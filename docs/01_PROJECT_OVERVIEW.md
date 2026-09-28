@@ -5,8 +5,9 @@
 > - **OBSERVATION** — patterns I noticed in the workflow.
 > - **PROPOSED** — ideas/designs I created. Not used by the company.
 >
-> DOCFLOW is an **independent prototype** inspired by my internship workflow.
-> It is **not** the company's real system and uses **no real company data**.
+> SAKHA Finance Operations is an **independent prototype** developed from my internship
+> workflow at PT. Sakha Internasional. It is **not** the company's real production system
+> and uses **no real company data**.
 
 ---
 
@@ -14,10 +15,10 @@
 
 | Item | Keterangan |
 |---|---|
-| Judul | **DOCFLOW — Document & Transaction Operations Management System** |
-| Tagline | Organize. Verify. Track. |
-| Jenis | Full-stack prototype / usulan sistem (bukan sistem perusahaan) |
-| Terinspirasi dari | Pengalaman PKL pada pekerjaan operasional dokumen & transaksi |
+| Judul | **SAKHA Finance Operations — Sistem Informasi Pengelolaan Data dan Dokumen Finance** |
+| Konteks | Prototype pengembangan berdasarkan kegiatan PKL di PT. Sakha Internasional |
+| Jenis | Full-stack prototype / usulan sistem (bukan sistem produksi perusahaan) |
+| Terinspirasi dari | Pengalaman PKL pada pekerjaan administrasi Finance & dokumen |
 | Periode PKL | ± 20 Januari – 29 Juni |
 | Peserta | Siswa SMK jurusan Rekayasa Perangkat Lunak (RPL) |
 | Stack | Laravel 13 + PostgreSQL 17 + React 18 + TypeScript + Vite + Tailwind CSS |
@@ -28,7 +29,7 @@
 ## Latar Belakang (ACTUAL)
 
 Selama PKL, saya tidak membuat aplikasi dari awal. Pekerjaan saya sehari-hari adalah
-membantu proses operasional: invoice, resi, dokumen fisik/digital, marketplace,
+membantu proses administrasi Finance: invoice, resi, dokumen fisik/digital, marketplace,
 pengadaan, payment, pengiriman, scanning, filling, dashboard, Accurate, Excel,
 WhatsApp, dan arsip.
 
@@ -37,7 +38,7 @@ Dari pekerjaan itu muncul satu pola yang berulang (OBSERVATION):
 > **Data dan dokumen datang dari banyak sumber → harus dicek → dicocokkan → diinput →
 > di-scan/rename → disimpan → di-filling → dimonitor → diverifikasi.**
 
-Urutan inilah yang menjadi *design principle* DOCFLOW: **data harus mengalir melalui
+Urutan inilah yang menjadi *design principle* sistem ini: **data harus mengalir melalui
 sistem dalam satu alur yang bisa ditelusuri.**
 
 ---
@@ -100,4 +101,4 @@ sistem dalam satu alur yang bisa ditelusuri.**
 | 8 | Struktur presentasi + speaker notes | `08_PRESENTATION.md` |
 | 9 | Q&A sidang | `09_QA_SIDANG.md` |
 | 10 | Audit kejujuran | `11_FINAL_REVIEW.md` |
-| 11 | Aplikasi jalan | `../docflow/` |
+| 11 | Aplikasi jalan | `../sakha-finance/` |

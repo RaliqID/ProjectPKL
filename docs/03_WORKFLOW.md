@@ -1,7 +1,7 @@
 # 03 — WORKFLOW
 
 > **Label:** workflow di bawah ini adalah **ACTUAL** (alur yang saya jalani),
-> lalu dipetakan ke alur sistem DOCFLOW yang bersifat **PROPOSED**.
+> lalu dipetakan ke alur sistem SAKHA Finance Operations yang bersifat **PROPOSED**.
 
 ---
 
@@ -29,7 +29,7 @@ MONITORING
 VERIFIKASI
 ```
 
-Ini yang menjadi tulang punggung desain DOCFLOW: satu alur, bisa ditelusuri dari awal ke akhir.
+Ini yang menjadi tulang punggung desain SAKHA Finance Operations: satu alur, bisa ditelusuri dari awal ke akhir.
 
 ---
 
@@ -98,9 +98,9 @@ Ambil tanda terima → Buka Accurate → Sales Receipts
 
 ---
 
-## 3. Pemetaan: Workflow PKL → Alur DOCFLOW (PROPOSED)
+## 3. Pemetaan: Workflow PKL → Alur SAKHA Finance Operations (PROPOSED)
 
-| Workflow PKL | Padanan di DOCFLOW |
+| Workflow PKL | Padanan di SAKHA Finance Operations |
 |---|---|
 | WF-1 Invoice | Transaction → Invoice + Document (type INVOICE) |
 | WF-2 Resi | Document (type DELIVERY_ORDER) + Delivery (courier, tracking) |
@@ -113,9 +113,9 @@ Ambil tanda terima → Buka Accurate → Sales Receipts
 
 ---
 
-## 4. Workflow Engine (bagian dari DOCFLOW, PROPOSED)
+## 4. Workflow Engine (bagian dari SAKHA Finance Operations, PROPOSED)
 
-DOCFLOW tidak mengizinkan lompatan status sembarangan. Transisi yang sah:
+SAKHA Finance Operations tidak mengizinkan lompatan status sembarangan. Transisi yang sah:
 
 ```text
 DRAFT → PROCESSING → AWAITING_PAYMENT → PAID

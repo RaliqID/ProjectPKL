@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light" />
+    <meta
+      name="description"
+      content="SAKHA Finance Operations — Sistem Informasi Pengelolaan Data dan Dokumen Finance. Mengelola invoice, pembayaran, dokumen, pengiriman, arsip, dan verifikasi dalam satu alur kerja yang tertelusur."
+    />
+    <link rel="icon" type="image/png" href="/sakha-logo.png" />
+    <meta name="theme-color" content="#8f1d24" />
+    <title>Sakha Internasional — Finance Operations</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      // Apply the stored theme before React mounts to avoid a flash of the
+      // wrong theme. Mirrors the logic in src/lib/theme.tsx.
+      // Default is 'light' (not 'system') so a dark OS does not force the app
+      // dark without the user asking. The header toggle controls it from there.
+      (function () {
+        try {
+          var t = localStorage.getItem('sakha-theme') || 'light'
+          var dark = t === 'dark' || (t === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+          if (dark) document.documentElement.classList.add('dark')
+          document.documentElement.style.colorScheme = dark ? 'dark' : 'light'
+        } catch (e) {}
+      })()
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
