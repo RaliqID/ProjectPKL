@@ -19,7 +19,15 @@ import clsx from 'clsx'
  * decoration only and never blocks a click on the hero. `prefers-reduced-motion`
  * stops the drift entirely (the grid still shows, it just holds still).
  */
-export function AnimatedGrid({ active = false, className }: { active?: boolean; className?: string }) {
+export function AnimatedGrid({
+  active = false,
+  vignette = true,
+  className,
+}: {
+  active?: boolean
+  vignette?: boolean
+  className?: string
+}) {
   return (
     <div
       aria-hidden
@@ -45,8 +53,11 @@ export function AnimatedGrid({ active = false, className }: { active?: boolean; 
         }}
       />
       {/* Soft vignette so the grid fades toward the edges instead of ending on
-          a hard line, and blends into the section background. */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-ink-50" />
+          a hard line. Off for panels with their own dark backing, where the
+          section-background gradient would band. */}
+      {vignette ? (
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-ink-50" />
+      ) : null}
     </div>
   )
 }
