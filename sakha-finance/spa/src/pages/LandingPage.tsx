@@ -14,10 +14,11 @@ import {
   X,
 } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
-import { Reveal } from '@/components/Reveal'
+import { Reveal, MaskedReveal } from '@/components/Reveal'
 import { Logo } from '@/components/Logo'
 import { Footer as AppFooter } from '@/components/Footer'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { AnimatedGrid } from '@/components/AnimatedGrid'
 
 /*
  * Landing page.
@@ -124,38 +125,47 @@ function LandingNav() {
 /* --------------------------------------------------------------- Hero ---- */
 
 function Hero() {
+  const [hoverGrid, setHoverGrid] = useState(false)
+
   return (
-    <section className="border-b border-ink-200 bg-white">
-      <div className="mx-auto grid max-w-6xl grid-cols-1 gap-x-16 gap-y-12 px-5 py-16 lg:grid-cols-12 lg:px-8 lg:py-24">
+    <section
+      className="relative overflow-hidden border-b border-ink-200 bg-[var(--df-surface)]"
+      onMouseEnter={() => setHoverGrid(true)}
+      onMouseLeave={() => setHoverGrid(false)}
+    >
+      <AnimatedGrid active={hoverGrid} />
+      <div className="relative mx-auto grid max-w-6xl grid-cols-1 gap-x-16 gap-y-12 px-5 py-16 lg:grid-cols-12 lg:px-8 lg:py-24">
         <div className="lg:col-span-7">
-          <p className="df-section-label">Sistem Informasi Finance</p>
-          <h1 className="df-display-1 mt-5 text-balance">
-            Satu alur kerja untuk data Finance yang lebih tertata.
-          </h1>
-          <p className="mt-5 max-w-xl text-base leading-relaxed text-ink-600">
+          <p className="df-section-label animate-[fade-in_500ms_ease-out_both]">Sistem Informasi Finance</p>
+          <MaskedReveal delay={120}>
+            <h1 className="df-display-1 mt-5 text-balance">
+              Satu alur kerja untuk data Finance yang lebih tertata.
+            </h1>
+          </MaskedReveal>
+          <p className="mt-5 max-w-xl animate-[slide-up_600ms_ease-out_300ms_both] text-base leading-relaxed text-ink-600">
             Sistem informasi untuk membantu pengelolaan invoice, pembayaran, dokumen, pengiriman, dan aktivitas
             administrasi Finance.
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Link to="/login" className="df-btn-primary px-5 py-2.5 text-sm">
+          <div className="mt-8 flex animate-[slide-up_600ms_ease-out_420ms_both] flex-wrap items-center gap-3">
+            <Link to="/login" className="df-btn-primary group px-5 py-2.5 text-sm">
               Masuk ke Sistem
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
             </Link>
             <a href="#alur" className="df-btn-secondary px-5 py-2.5 text-sm">
               Lihat Alur Kerja
             </a>
           </div>
 
-          <p className="mt-6 text-xs text-ink-400">
+          <p className="mt-6 animate-[slide-up_600ms_ease-out_540ms_both] text-xs text-ink-400">
             Prototype pengembangan berdasarkan kegiatan PKL di PT. Sakha Internasional. Bukan sistem produksi resmi
             perusahaan dan tidak memuat data perusahaan.
           </p>
         </div>
 
         {/* Alur ringkas sebagai kartu "dokumen" */}
-        <div className="lg:col-span-5">
-          <div className="df-card overflow-hidden">
+        <Reveal from="right" delay={200} className="lg:col-span-5">
+          <div className="df-card overflow-hidden transition-shadow duration-300 hover:shadow-lift">
             <div className="flex items-center justify-between border-b border-ink-100 px-5 py-3">
               <span className="text-xs font-semibold uppercase tracking-[0.12em] text-ink-500">Alur Dokumen</span>
               <span className="font-mono text-2xs text-ink-400">FINANCE</span>
@@ -178,7 +188,7 @@ function Hero() {
               ))}
             </ol>
           </div>
-        </div>
+        </Reveal>
       </div>
     </section>
   )
@@ -208,14 +218,18 @@ function Workflow() {
         </p>
 
         <div className="mt-10 grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-ink-200 bg-ink-200 sm:grid-cols-2 lg:grid-cols-5">
-          {steps.map((s) => {
+          {steps.map((s, i) => {
             const Icon = s.icon
             return (
-              <div key={s.title} className="bg-white p-5">
-                <Icon className="h-5 w-5 text-accent-600" aria-hidden />
-                <p className="mt-3 text-sm font-semibold text-ink-900">{s.title}</p>
-                <p className="mt-1.5 text-xs leading-relaxed text-ink-500">{s.desc}</p>
-              </div>
+              <Reveal key={s.title} delay={i * 80} className="bg-white">
+                <div className="group h-full bg-white p-5 transition-colors duration-200 hover:bg-accent-50/40">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-accent-50 text-accent-600 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:bg-accent-100">
+                    <Icon className="h-[18px] w-[18px]" aria-hidden />
+                  </span>
+                  <p className="mt-3 text-sm font-semibold text-ink-900">{s.title}</p>
+                  <p className="mt-1.5 text-xs leading-relaxed text-ink-500">{s.desc}</p>
+                </div>
+              </Reveal>
             )
           })}
         </div>
@@ -253,14 +267,21 @@ function Modules() {
           {modules.map((m, i) => {
             const Icon = m.icon
             return (
-              <li key={m.name} className="flex items-start gap-4 border-t border-ink-100 py-4">
-                <span className="mt-0.5 font-mono text-2xs text-ink-400">{String(i + 1).padStart(2, '0')}</span>
-                <Icon className="mt-0.5 h-4 w-4 shrink-0 text-accent-600" aria-hidden />
-                <div>
-                  <p className="text-sm font-medium text-ink-900">{m.name}</p>
-                  <p className="mt-0.5 text-xs text-ink-500">{m.desc}</p>
+              <Reveal key={m.name} as="li" delay={(i % 2) * 70} from="left">
+                <div className="group flex items-start gap-4 border-t border-ink-100 py-4 transition-colors duration-200 hover:border-accent-200">
+                  <span className="mt-0.5 font-mono text-2xs text-ink-400 transition-colors group-hover:text-accent-500">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <Icon
+                    className="mt-0.5 h-4 w-4 shrink-0 text-accent-600 transition-transform duration-200 group-hover:scale-110"
+                    aria-hidden
+                  />
+                  <div>
+                    <p className="text-sm font-medium text-ink-900">{m.name}</p>
+                    <p className="mt-0.5 text-xs text-ink-500">{m.desc}</p>
+                  </div>
                 </div>
-              </li>
+              </Reveal>
             )
           })}
         </ul>
@@ -284,38 +305,43 @@ function ArchiveVerification() {
           </p>
           <ul className="mt-6 space-y-2 text-sm text-ink-700">
             {['Pencarian & filter dokumen', 'Pratinjau dan unduh berkas', 'Lokasi arsip tercatat', 'Status dokumen terpantau'].map(
-              (item) => (
-                <li key={item} className="flex items-center gap-2.5">
+              (item, i) => (
+                <Reveal as="li" key={item} delay={i * 70} from="left" className="flex items-center gap-2.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-accent-500" aria-hidden />
                   {item}
-                </li>
+                </Reveal>
               ),
             )}
           </ul>
         </div>
 
-        <div className="df-card p-6">
-          <p className="text-sm font-semibold text-ink-900">Hasil verifikasi</p>
-          <p className="mt-1 text-xs text-ink-500">
-            Setiap pemeriksaan memberi alasan, bukan sekadar status.
-          </p>
-          <ul className="mt-5 space-y-3">
-            {[
-              ['Pelanggan sesuai', 'Sesuai', 'bg-ok-500'],
-              ['Nominal invoice sesuai', 'Sesuai', 'bg-ok-500'],
-              ['Nominal pembayaran', 'Perlu Diperiksa', 'bg-warn-500'],
-              ['Kelengkapan dokumen', 'Tidak Sesuai', 'bg-bad-500'],
-            ].map(([label, status, dot]) => (
-              <li key={label} className="flex items-center justify-between border-b border-ink-100 pb-3 last:border-0 last:pb-0">
-                <span className="text-sm text-ink-700">{label}</span>
-                <span className="flex items-center gap-2 text-xs font-medium text-ink-600">
-                  <span className={`h-2 w-2 rounded-full ${dot}`} aria-hidden />
-                  {status}
-                </span>
+        <Reveal from="right" delay={120}>
+          <div className="df-card p-6 transition-shadow duration-300 hover:shadow-lift">
+            <p className="text-sm font-semibold text-ink-900">Hasil verifikasi</p>
+            <p className="mt-1 text-xs text-ink-500">
+              Setiap pemeriksaan memberi alasan, bukan sekadar status.
+            </p>
+            <ul className="mt-5 space-y-3">
+              {[
+                ['Pelanggan sesuai', 'Sesuai', 'bg-ok-500'],
+                ['Nominal invoice sesuai', 'Sesuai', 'bg-ok-500'],
+                ['Nominal pembayaran', 'Perlu Diperiksa', 'bg-warn-500'],
+                ['Kelengkapan dokumen', 'Tidak Sesuai', 'bg-bad-500'],
+              ].map(([label, status, dot]) => (
+                <li
+                  key={label}
+                  className="group flex items-center justify-between border-b border-ink-100 pb-3 transition-colors last:border-0 last:pb-0 hover:border-accent-200"
+                >
+                  <span className="text-sm text-ink-700">{label}</span>
+                  <span className="flex items-center gap-2 text-xs font-medium text-ink-600">
+                    <span className={`h-2 w-2 rounded-full ${dot} transition-transform group-hover:scale-125`} aria-hidden />
+                    {status}
+                  </span>
               </li>
-            ))}
-          </ul>
-        </div>
+              ))}
+            </ul>
+          </div>
+        </Reveal>
       </div>
     </section>
   )
@@ -356,9 +382,9 @@ export function LandingPage() {
   return (
     <div className="min-h-screen bg-white">
       <LandingNav />
-      <Reveal>
-        <Hero />
-      </Reveal>
+      {/* The hero is above the fold, so it renders immediately rather than
+          waiting for a scroll reveal; its headline animates on mount instead. */}
+      <Hero />
       <Reveal>
         <Workflow />
       </Reveal>

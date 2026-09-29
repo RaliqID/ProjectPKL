@@ -11,6 +11,9 @@
     --df-text: theme('colors.ink.900');
     --df-text-muted: theme('colors.ink.500');
     --df-accent: theme('colors.accent.600');
+    /* Line colour for the hero background grid. Kept as a token so the same
+       grid component reads correctly on the dark surface too. */
+    --grid-line: rgb(143 29 36 / 0.14);
   }
 
   /*
@@ -33,6 +36,10 @@
     --df-text: #f3f1ec;
     --df-text-muted: #a8a29a;
     --df-accent: theme('colors.accent.400');
+
+    /* On the dark surface the accent red is too dark to read as a line, so the
+       grid uses a light warm grey at low opacity instead. */
+    --grid-line: rgb(231 228 221 / 0.10);
 
     /* Warm dark neutral scale (mirrors the light one, inverted). */
     --ink-50: #12100f;

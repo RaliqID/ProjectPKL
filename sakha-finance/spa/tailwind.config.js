@@ -91,6 +91,13 @@ export default {
         shimmer: {
           '100%': { transform: 'translateX(100%)' },
         },
+        // Slow diagonal drift for the hero background grid. One full cell per
+        // cycle keeps the loop seamless; the layer is oversized so the pattern
+        // never exposes an edge while it moves.
+        'grid-drift': {
+          from: { transform: 'translate3d(0, 0, 0)' },
+          to: { transform: 'translate3d(48px, 48px, 0)' },
+        },
       },
       animation: {
         'fade-in': 'fade-in 120ms ease-out',
