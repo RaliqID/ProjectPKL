@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   AlertTriangle,
@@ -50,12 +50,37 @@ export function OverviewPage() {
   const navigate = useNavigate()
   const [showAllAttention, setShowAllAttention] = useState(false)
 
-  // Keep the queue short by default; the full list is one click away and the
-  // count stays visible.
-  const ATTENTION_PREVIEW = 5
   const attention = data?.attention ?? []
-  const visibleAttention = showAllAttention ? attention : attention.slice(0, ATTENTION_PREVIEW)
-  const hiddenAttention = attention.length - ATTENTION_PREVIEW
+
+  // The card stretches to match the taller column beside it, so a fixed preview
+  // count leaves a band of empty space below the list on large screens. Instead
+  // we measure the card and fill exactly as many rows as fit, then let "Lihat
+  // semua" carry the remainder. Resize recomputes it.
+  const cardRef = useRef<HTMLDivElement | null>(null)
+  const [rowsThatFit, setRowsThatFit] = useState(5)
+
+  useLayoutEffect(() => {
+    const card = cardRef.current
+    if (!card) return
+
+    const ROW_HEIGHT = 61 // one attention row (py-3 + text + border), px
+    const CHROME = 52 + 56 + 92 // header + footer button + severity strip, px
+
+    const measure = () => {
+      const available = card.getBoundingClientRect().height - CHROME
+      const fit = Math.max(3, Math.floor(available / ROW_HEIGHT))
+      setRowsThatFit(fit)
+    }
+
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(card)
+    return () => observer.disconnect()
+  }, [attention.length])
+
+  const previewCount = showAllAttention ? attention.length : Math.min(rowsThatFit, attention.length)
+  const visibleAttention = attention.slice(0, previewCount)
+  const hiddenAttention = attention.length - previewCount
 
   return (
     <div>
@@ -145,7 +170,7 @@ export function OverviewPage() {
             <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
               {/* Perlu ditindaklanjuti: stretches to match the right column so
                   the two sides end level, and the list fills the height. */}
-              <div className="df-card flex flex-col xl:col-span-2">
+              <div ref={cardRef} className="df-card flex flex-col xl:col-span-2">
                 <div className="flex items-center justify-between border-b border-ink-100 px-5 py-3.5">
                   <div className="flex items-center gap-2">
                     <Zap className="h-4 w-4 text-warn-500" aria-hidden />
@@ -198,12 +223,12 @@ export function OverviewPage() {
                       </div>
                     ) : null}
 
-                    {/* Fills the leftover height with something useful: a split
-                        of the queue by severity, so an operator sees at a glance
-                        how much is urgent before reading the rows. */}
+                    {/* Fills the leftover height with something useful: how many
+                        items are urgent, so an operator sees the weight of the
+                        queue before reading the rows. */}
                     <div className="mt-auto border-t border-ink-100 px-5 py-4">
                       <p className="mb-3 text-2xs font-semibold uppercase tracking-wide text-ink-400">
-                        Sebaran berdasarkan prioritas
+                        Ringkasan Prioritas
                       </p>
                       <div className="grid grid-cols-3 gap-3">
                         {(
