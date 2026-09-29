@@ -142,9 +142,10 @@ export function OverviewPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-3">
-              {/* Perlu ditindaklanjuti */}
-              <div className="df-card xl:col-span-2">
+            <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+              {/* Perlu ditindaklanjuti: stretches to match the right column so
+                  the two sides end level, and the list fills the height. */}
+              <div className="df-card flex flex-col xl:col-span-2">
                 <div className="flex items-center justify-between border-b border-ink-100 px-5 py-3.5">
                   <div className="flex items-center gap-2">
                     <Zap className="h-4 w-4 text-warn-500" aria-hidden />
@@ -184,6 +185,7 @@ export function OverviewPage() {
                         )
                       })}
                     </ul>
+
                     {hiddenAttention > 0 || showAllAttention ? (
                       <div className="border-t border-ink-100 px-5 py-2.5 text-center">
                         <button
@@ -195,6 +197,29 @@ export function OverviewPage() {
                         </button>
                       </div>
                     ) : null}
+
+                    {/* Fills the leftover height with something useful: a split
+                        of the queue by severity, so an operator sees at a glance
+                        how much is urgent before reading the rows. */}
+                    <div className="mt-auto border-t border-ink-100 px-5 py-4">
+                      <p className="mb-3 text-2xs font-semibold uppercase tracking-wide text-ink-400">
+                        Sebaran berdasarkan prioritas
+                      </p>
+                      <div className="grid grid-cols-3 gap-3">
+                        {(
+                          [
+                            ['Tinggi', attention.filter((a) => a.severity === 'HIGH').length, 'text-bad-600'],
+                            ['Sedang', attention.filter((a) => a.severity === 'MEDIUM').length, 'text-warn-600'],
+                            ['Rendah', attention.filter((a) => a.severity === 'LOW').length, 'text-ink-600'],
+                          ] as const
+                        ).map(([label, count, tone]) => (
+                          <div key={label} className="rounded-md border border-ink-100 bg-ink-50/60 px-3 py-2.5">
+                            <p className={`text-lg font-semibold tabular-nums ${tone}`}>{count}</p>
+                            <p className="mt-0.5 text-2xs text-ink-500">{label}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </>
                 )}
               </div>
