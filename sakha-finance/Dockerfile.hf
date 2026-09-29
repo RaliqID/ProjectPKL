@@ -1,0 +1,85 @@
+# SAKHA Finance Operations — Hugging Face Spaces image
+#
+# A single self-contained image for the free Spaces demo: the React SPA is built
+# and served by Laravel on one origin, and the database is SQLite (created and
+# seeded on start) because Spaces has no managed PostgreSQL.
+#
+# The production image (Dockerfile) targets Postgres + worker + scheduler; this
+# one is the "just show the app" variant for a no-card free host.
+
+# ---------------------------------------------------------------- frontend --
+FROM node:22-alpine AS spa
+WORKDIR /spa
+COPY spa/package*.json ./
+RUN npm ci
+COPY spa/ ./
+RUN npm run build -- --outDir dist --emptyOutDir
+
+# ------------------------------------------------------------------ vendor --
+FROM composer:2 AS vendor
+WORKDIR /app
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-interaction --no-scripts --prefer-dist --optimize-autoloader
+
+# ------------------------------------------------------------------- runtime --
+FROM php:8.3-cli-alpine AS runtime
+
+# Extensions: sqlite3/pdo_sqlite (database), gd (dompdf logo), intl/mbstring
+# (Indonesian text), zip, bcmath (money), opcache.
+RUN apk add --no-cache \
+        sqlite-dev \
+        libzip-dev \
+        icu-dev \
+        oniguruma-dev \
+        libpng-dev \
+        libjpeg-turbo-dev \
+        freetype-dev \
+        bash \
+        curl \
+        unzip \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) \
+        pdo_sqlite \
+        sqlite3 \
+        gd \
+        zip \
+        intl \
+        mbstring \
+        bcmath \
+        opcache
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www/html
+COPY . .
+COPY --from=vendor /app/vendor ./vendor
+
+# Built SPA goes into Laravel's public directory.
+RUN rm -rf public/assets public/index.html \
+    && cp -r /spa/dist/. ./public/
+
+ENV COMPOSER_ALLOW_SUPERUSER=1
+RUN composer dump-autoload --optimize --no-dev --no-interaction
+
+RUN mkdir -p storage/framework/cache/data storage/framework/sessions \
+        storage/framework/views storage/logs bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache
+
+COPY docker/start-hf.sh /usr/local/bin/start-hf.sh
+RUN chmod +x /usr/local/bin/start-hf.sh
+
+# SQLite + log mail for the demo (no external services required).
+ENV APP_ENV=production \
+    APP_DEBUG=false \
+    LOG_CHANNEL=stderr \
+    DB_CONNECTION=sqlite \
+    DB_DATABASE=/var/www/html/database/database.sqlite \
+    SESSION_DRIVER=database \
+    QUEUE_CONNECTION=database \
+    CACHE_STORE=database \
+    MAIL_MAILER=log
+
+# Hugging Face Spaces expects the container to listen on 7860.
+EXPOSE 7860
+
+CMD ["start-hf.sh"]

@@ -43,8 +43,8 @@ class PaymentController extends Controller
         if ($term = $request->string('q')->toString()) {
             $like = '%'.$term.'%';
             $query->where(function ($q) use ($like) {
-                $q->where('payment_reference', 'ilike', $like)
-                    ->orWhereHas('transaction', fn ($t) => $t->where('transaction_code', 'ilike', $like));
+                $q->where('payment_reference', \App\Support\Search::likeOperator(), $like)
+                    ->orWhereHas('transaction', fn ($t) => $t->where('transaction_code', \App\Support\Search::likeOperator(), $like));
             });
         }
 
@@ -94,8 +94,8 @@ class PaymentController extends Controller
             ->when($request->filled('search'), function ($q) use ($request) {
                 $term = '%'.$request->string('search').'%';
                 $q->where(function ($w) use ($term) {
-                    $w->where('transaction_code', 'ilike', $term)
-                        ->orWhereHas('customer', fn ($c) => $c->where('name', 'ilike', $term));
+                    $w->where('transaction_code', \App\Support\Search::likeOperator(), $term)
+                        ->orWhereHas('customer', fn ($c) => $c->where('name', \App\Support\Search::likeOperator(), $term));
                 });
             })
             ->whereHas('invoices')

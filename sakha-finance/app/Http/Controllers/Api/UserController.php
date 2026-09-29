@@ -24,7 +24,7 @@ class UserController extends Controller
 
         if ($term = $request->string('q')->toString()) {
             $like = '%'.$term.'%';
-            $query->where(fn ($q) => $q->where('name', 'ilike', $like)->orWhere('email', 'ilike', $like));
+            $query->where(fn ($q) => $q->where('name', \App\Support\Search::likeOperator(), $like)->orWhere('email', \App\Support\Search::likeOperator(), $like));
         }
 
         if ($role = $request->string('role')->toString()) {

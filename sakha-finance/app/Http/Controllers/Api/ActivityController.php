@@ -27,12 +27,12 @@ class ActivityController extends Controller
         }
 
         if ($action = $request->string('action')->toString()) {
-            $query->where('action', 'ilike', '%'.$action.'%');
+            $query->where('action', \App\Support\Search::likeOperator(), '%'.$action.'%');
         }
 
         // Free-text search over the human-readable description.
         if ($term = $request->string('q')->toString()) {
-            $query->where('description', 'ilike', '%'.$term.'%');
+            $query->where('description', \App\Support\Search::likeOperator(), '%'.$term.'%');
         }
 
         if ($from = $request->string('date_from')->toString()) {

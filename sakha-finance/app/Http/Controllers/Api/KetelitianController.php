@@ -26,8 +26,8 @@ class KetelitianController extends Controller
             ->when($request->filled('search'), function ($q) use ($request) {
                 $term = '%'.$request->string('search').'%';
                 $q->where(function ($w) use ($term) {
-                    $w->where('transaction_code', 'ilike', $term)
-                        ->orWhereHas('customer', fn ($c) => $c->where('name', 'ilike', $term));
+                    $w->where('transaction_code', \App\Support\Search::likeOperator(), $term)
+                        ->orWhereHas('customer', fn ($c) => $c->where('name', \App\Support\Search::likeOperator(), $term));
                 });
             })
             ->latest('transaction_date');

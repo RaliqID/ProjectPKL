@@ -117,13 +117,13 @@ class TransactionController extends Controller
         $transactions = Transaction::query()
             ->with('customer')
             ->where(function ($q) use ($like) {
-                $q->where('transaction_code', 'ilike', $like)
-                    ->orWhere('purchase_order_number', 'ilike', $like)
-                    ->orWhere('reference_number', 'ilike', $like)
-                    ->orWhereHas('customer', fn ($c) => $c->where('name', 'ilike', $like)->orWhere('company_name', 'ilike', $like))
-                    ->orWhereHas('invoices', fn ($i) => $i->where('invoice_number', 'ilike', $like))
-                    ->orWhereHas('deliveries', fn ($d) => $d->where('tracking_number', 'ilike', $like))
-                    ->orWhereHas('payments', fn ($p) => $p->where('payment_reference', 'ilike', $like));
+                $q->where('transaction_code', \App\Support\Search::likeOperator(), $like)
+                    ->orWhere('purchase_order_number', \App\Support\Search::likeOperator(), $like)
+                    ->orWhere('reference_number', \App\Support\Search::likeOperator(), $like)
+                    ->orWhereHas('customer', fn ($c) => $c->where('name', \App\Support\Search::likeOperator(), $like)->orWhere('company_name', \App\Support\Search::likeOperator(), $like))
+                    ->orWhereHas('invoices', fn ($i) => $i->where('invoice_number', \App\Support\Search::likeOperator(), $like))
+                    ->orWhereHas('deliveries', fn ($d) => $d->where('tracking_number', \App\Support\Search::likeOperator(), $like))
+                    ->orWhereHas('payments', fn ($p) => $p->where('payment_reference', \App\Support\Search::likeOperator(), $like));
             })
             ->limit(15)
             ->get();
@@ -205,9 +205,9 @@ class TransactionController extends Controller
         if ($term = $request->string('q')->toString()) {
             $like = '%'.$term.'%';
             $query->where(function ($q) use ($like) {
-                $q->where('transaction_code', 'ilike', $like)
-                    ->orWhere('purchase_order_number', 'ilike', $like)
-                    ->orWhereHas('customer', fn ($c) => $c->where('name', 'ilike', $like));
+                $q->where('transaction_code', \App\Support\Search::likeOperator(), $like)
+                    ->orWhere('purchase_order_number', \App\Support\Search::likeOperator(), $like)
+                    ->orWhereHas('customer', fn ($c) => $c->where('name', \App\Support\Search::likeOperator(), $like));
             });
         }
     }

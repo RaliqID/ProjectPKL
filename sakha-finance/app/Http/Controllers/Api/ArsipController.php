@@ -26,11 +26,11 @@ class ArsipController extends Controller
             ->when($request->filled('search'), function ($q) use ($request) {
                 $term = '%'.$request->string('search').'%';
                 $q->where(function ($w) use ($term) {
-                    $w->where('document_name', 'ilike', $term)
-                        ->orWhere('document_number', 'ilike', $term)
-                        ->orWhere('archive_code', 'ilike', $term)
-                        ->orWhere('file_name', 'ilike', $term)
-                        ->orWhereHas('customer', fn ($c) => $c->where('name', 'ilike', $term));
+                    $w->where('document_name', \App\Support\Search::likeOperator(), $term)
+                        ->orWhere('document_number', \App\Support\Search::likeOperator(), $term)
+                        ->orWhere('archive_code', \App\Support\Search::likeOperator(), $term)
+                        ->orWhere('file_name', \App\Support\Search::likeOperator(), $term)
+                        ->orWhereHas('customer', fn ($c) => $c->where('name', \App\Support\Search::likeOperator(), $term));
                 });
             })
             ->when($request->filled('document_type'), fn ($q) => $q->where('document_type', $request->string('document_type')))

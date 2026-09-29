@@ -20,10 +20,10 @@ class PengeluaranController extends Controller
             ->when($request->filled('search'), function ($q) use ($request) {
                 $term = '%'.$request->string('search').'%';
                 $q->where(function ($w) use ($term) {
-                    $w->where('expense_code', 'ilike', $term)
-                        ->orWhere('vehicle', 'ilike', $term)
-                        ->orWhere('station', 'ilike', $term)
-                        ->orWhere('proof_reference', 'ilike', $term);
+                    $w->where('expense_code', \App\Support\Search::likeOperator(), $term)
+                        ->orWhere('vehicle', \App\Support\Search::likeOperator(), $term)
+                        ->orWhere('station', \App\Support\Search::likeOperator(), $term)
+                        ->orWhere('proof_reference', \App\Support\Search::likeOperator(), $term);
                 });
             })
             ->when($request->filled('category'), fn ($q) => $q->where('category', $request->string('category')))

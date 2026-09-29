@@ -23,10 +23,10 @@ class CustomerController extends Controller
         if ($term = $request->string('q')->toString()) {
             $like = '%'.$term.'%';
             $query->where(function ($q) use ($like) {
-                $q->where('name', 'ilike', $like)
-                    ->orWhere('company_name', 'ilike', $like)
-                    ->orWhere('customer_code', 'ilike', $like)
-                    ->orWhere('email', 'ilike', $like);
+                $q->where('name', \App\Support\Search::likeOperator(), $like)
+                    ->orWhere('company_name', \App\Support\Search::likeOperator(), $like)
+                    ->orWhere('customer_code', \App\Support\Search::likeOperator(), $like)
+                    ->orWhere('email', \App\Support\Search::likeOperator(), $like);
             });
         }
 

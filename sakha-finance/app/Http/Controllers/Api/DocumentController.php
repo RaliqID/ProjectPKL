@@ -47,9 +47,9 @@ class DocumentController extends Controller
         if ($term = $request->string('q')->toString()) {
             $like = '%'.$term.'%';
             $query->where(function ($q) use ($like) {
-                $q->where('original_filename', 'ilike', $like)
-                    ->orWhere('document_number', 'ilike', $like)
-                    ->orWhereHas('transaction', fn ($t) => $t->where('transaction_code', 'ilike', $like));
+                $q->where('original_filename', \App\Support\Search::likeOperator(), $like)
+                    ->orWhere('document_number', \App\Support\Search::likeOperator(), $like)
+                    ->orWhereHas('transaction', fn ($t) => $t->where('transaction_code', \App\Support\Search::likeOperator(), $like));
             });
         }
 

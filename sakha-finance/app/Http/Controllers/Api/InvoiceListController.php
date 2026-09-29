@@ -25,9 +25,9 @@ class InvoiceListController extends Controller
             ->when($request->filled('search'), function ($q) use ($request) {
                 $term = '%'.$request->string('search').'%';
                 $q->where(function ($w) use ($term) {
-                    $w->where('invoice_number', 'ilike', $term)
-                        ->orWhereHas('transaction', fn ($t) => $t->where('transaction_code', 'ilike', $term))
-                        ->orWhereHas('transaction.customer', fn ($c) => $c->where('name', 'ilike', $term));
+                    $w->where('invoice_number', \App\Support\Search::likeOperator(), $term)
+                        ->orWhereHas('transaction', fn ($t) => $t->where('transaction_code', \App\Support\Search::likeOperator(), $term))
+                        ->orWhereHas('transaction.customer', fn ($c) => $c->where('name', \App\Support\Search::likeOperator(), $term));
                 });
             })
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->string('status')))

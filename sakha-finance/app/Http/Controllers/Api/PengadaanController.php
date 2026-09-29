@@ -23,11 +23,11 @@ class PengadaanController extends Controller
             ->when($request->filled('search'), function ($q) use ($request) {
                 $term = '%'.$request->string('search').'%';
                 $q->where(function ($w) use ($term) {
-                    $w->where('procurement_code', 'ilike', $term)
-                        ->orWhere('spb_number', 'ilike', $term)
-                        ->orWhere('item_name', 'ilike', $term)
-                        ->orWhere('supplier', 'ilike', $term)
-                        ->orWhere('tracking_number', 'ilike', $term);
+                    $w->where('procurement_code', \App\Support\Search::likeOperator(), $term)
+                        ->orWhere('spb_number', \App\Support\Search::likeOperator(), $term)
+                        ->orWhere('item_name', \App\Support\Search::likeOperator(), $term)
+                        ->orWhere('supplier', \App\Support\Search::likeOperator(), $term)
+                        ->orWhere('tracking_number', \App\Support\Search::likeOperator(), $term);
                 });
             })
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->string('status')))

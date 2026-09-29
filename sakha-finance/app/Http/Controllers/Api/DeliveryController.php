@@ -30,7 +30,7 @@ class DeliveryController extends Controller
         }
 
         if ($courier = $request->string('courier')->toString()) {
-            $query->where('courier', 'ilike', '%'.$courier.'%');
+            $query->where('courier', \App\Support\Search::likeOperator(), '%'.$courier.'%');
         }
 
         if ($from = $request->string('date_from')->toString()) {
@@ -44,9 +44,9 @@ class DeliveryController extends Controller
         if ($term = $request->string('q')->toString()) {
             $like = '%'.$term.'%';
             $query->where(function ($q) use ($like) {
-                $q->where('tracking_number', 'ilike', $like)
-                    ->orWhere('delivery_number', 'ilike', $like)
-                    ->orWhereHas('transaction', fn ($t) => $t->where('transaction_code', 'ilike', $like));
+                $q->where('tracking_number', \App\Support\Search::likeOperator(), $like)
+                    ->orWhere('delivery_number', \App\Support\Search::likeOperator(), $like)
+                    ->orWhereHas('transaction', fn ($t) => $t->where('transaction_code', \App\Support\Search::likeOperator(), $like));
             });
         }
 
