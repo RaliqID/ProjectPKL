@@ -98,6 +98,12 @@ export default {
           from: { transform: 'translate3d(0, 0, 0)' },
           to: { transform: 'translate3d(48px, 48px, 0)' },
         },
+        // Route change: a short fade plus a small rise. Kept subtle so repeated
+        // navigation does not feel animated.
+        'page-enter': {
+          from: { opacity: '0', transform: 'translateY(6px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
+        },
       },
       animation: {
         'fade-in': 'fade-in 120ms ease-out',

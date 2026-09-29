@@ -32,6 +32,8 @@ import { Logo } from '@/components/Logo'
 import { RoleBadge } from '@/components/RoleBadge'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { Footer } from '@/components/Footer'
+import { PageTransition } from '@/components/PageTransition'
+import { AnimatedGrid } from '@/components/AnimatedGrid'
 
 interface NavItem {
   to: string
@@ -105,8 +107,11 @@ export function AppShell() {
           </button>
         </div>
 
-        <nav className="flex-1 overflow-y-auto px-2.5 py-3" aria-label="Menu utama">
-          <ul className="space-y-0.5">
+        {/* The module list is long (14 entries). It scrolls on its own so the
+            header and the account block stay pinned, and the list never depends
+            on the page scroll position. */}
+        <nav className="flex-1 overflow-y-auto overscroll-contain px-2.5 py-2" aria-label="Menu utama">
+          <ul className="space-y-px">
             {items.map((item) => {
               const Icon = item.icon
               return (
@@ -116,7 +121,7 @@ export function AppShell() {
                     end={item.to === '/app'}
                     className={({ isActive }) =>
                       clsx(
-                        'flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm font-medium transition-colors',
+                        'flex items-center gap-2.5 rounded-md px-2.5 py-[7px] text-[13px] font-medium transition-colors',
                         isActive
                           ? 'bg-accent-50 text-accent-700'
                           : 'text-ink-600 hover:bg-ink-50 hover:text-ink-900',
@@ -132,7 +137,7 @@ export function AppShell() {
           </ul>
         </nav>
 
-        <div className="border-t border-ink-200 p-3">
+        <div className="shrink-0 border-t border-ink-200 p-3">
           <div className="flex items-center gap-2.5 rounded-md px-1 py-1">
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-ink-100 text-xs font-semibold text-ink-600">
               {initials(user?.name ?? '?')}
@@ -220,9 +225,16 @@ export function AppShell() {
 
         {notifOpen ? <NotificationPanel onClose={() => setNotifOpen(false)} /> : null}
 
-        <main id="main" className="flex min-h-[calc(100vh-3.5rem)] flex-col">
-          <div className="flex-1">
-            <Outlet />
+        <main id="main" className="relative flex min-h-[calc(100vh-3.5rem)] flex-col">
+          {/* A very faint grid behind the workspace. The app is data-dense, so
+              this sits at low opacity and stays out of the way of tables; it
+              exists to tie the app back to the landing/login surfaces rather
+              than to be noticed. */}
+          <AnimatedGrid className="opacity-[0.4]" />
+          <div className="relative flex-1">
+            <PageTransition>
+              <Outlet />
+            </PageTransition>
           </div>
           <Footer variant="app" />
         </main>
