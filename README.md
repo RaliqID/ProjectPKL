@@ -15,6 +15,24 @@ Repo ini berisi dua hal:
 
 ---
 
+## Deploy
+
+Aplikasi ini **tidak bisa** di-host di Vercel (Vercel tidak mendukung runtime PHP,
+PostgreSQL persisten, queue worker, maupun scheduler). Gunakan host yang mendukung
+Docker — **Render** (direkomendasikan, gratis) atau Railway/VPS.
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
+
+1. Klik tombol di atas (atau: Render → **New** → **Blueprint** → pilih repo ini).
+2. Render membaca `sakha-finance/render.yaml` dan membuat otomatis:
+   web + queue worker + scheduler + PostgreSQL.
+3. Setelah deploy pertama, isi `APP_URL` (URL `https://*.onrender.com` yang diberikan)
+   dan kredensial email (`MAIL_MAILER=smtp` + `MAIL_*`) di dashboard.
+
+Panduan lengkap: **[`sakha-finance/DEPLOY.md`](sakha-finance/DEPLOY.md)**.
+
+---
+
 ## Menjalankan Aplikasi
 
 Prasyarat: PHP 8.3+, Composer, Node 18+, PostgreSQL (sudah ada cluster lokal).

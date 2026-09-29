@@ -1,0 +1,152 @@
+# Render Blueprint — SAKHA Finance Operations
+#
+# One file deploys the whole app: web + queue worker + scheduler + PostgreSQL.
+# In the Render dashboard: New > Blueprint > pick this repo. Render reads this
+# file, creates every service and wires the database credentials automatically.
+#
+# After the first deploy, set APP_URL (and mail credentials) in the dashboard:
+# the web service's URL is shown at the top of its page.
+#
+# Docs: https://render.com/docs/blueprint-spec
+#
+# Note: Render's Blueprint spec does not let an env-var group pull values "from
+# a database", so the DB credentials are declared on each service directly. It
+# is more verbose but it is the form Render actually accepts.
+
+databases:
+  - name: sakha-db
+    databaseName: sakha_finance
+    user: sakha
+    plan: free
+    region: singapore
+
+services:
+  # ---------------------------------------------------------------- web app --
+  - type: web
+    name: sakha-finance
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./sakha-finance/Dockerfile
+    dockerContext: ./sakha-finance
+    healthCheckPath: /up
+    autoDeploy: true
+    dockerCommand: start.sh web
+    envVars:
+      - key: APP_NAME
+        value: "SAKHA Finance Operations"
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_TIMEZONE
+        value: Asia/Jakarta
+      - key: APP_LOCALE
+        value: id
+      - key: APP_FALLBACK_LOCALE
+        value: id
+      - key: APP_KEY
+        generateValue: true
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        fromDatabase: { name: sakha-db, property: host }
+      - key: DB_PORT
+        fromDatabase: { name: sakha-db, property: port }
+      - key: DB_DATABASE
+        fromDatabase: { name: sakha-db, property: database }
+      - key: DB_USERNAME
+        fromDatabase: { name: sakha-db, property: user }
+      - key: DB_PASSWORD
+        fromDatabase: { name: sakha-db, property: password }
+      - key: SESSION_DRIVER
+        value: database
+      - key: SESSION_SECURE_COOKIE
+        value: "true"
+      - key: QUEUE_CONNECTION
+        value: database
+      - key: CACHE_STORE
+        value: database
+      - key: MAIL_MAILER
+        value: log
+      - key: MAIL_FROM_ADDRESS
+        value: "noreply@sakha.test"
+      # Set in dashboard after first deploy:
+      #   APP_URL = https://sakha-finance.onrender.com
+      #   MAIL_MAILER=smtp + MAIL_HOST/PORT/USERNAME/PASSWORD (Mailtrap) for real email
+
+  # ------------------------------------------------------------ queue worker --
+  - type: worker
+    name: sakha-worker
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./sakha-finance/Dockerfile
+    dockerContext: ./sakha-finance
+    dockerCommand: start.sh worker
+    autoDeploy: true
+    envVars:
+      - key: APP_NAME
+        value: "SAKHA Finance Operations"
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_TIMEZONE
+        value: Asia/Jakarta
+      - key: APP_KEY
+        sync: false
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        fromDatabase: { name: sakha-db, property: host }
+      - key: DB_PORT
+        fromDatabase: { name: sakha-db, property: port }
+      - key: DB_DATABASE
+        fromDatabase: { name: sakha-db, property: database }
+      - key: DB_USERNAME
+        fromDatabase: { name: sakha-db, property: user }
+      - key: DB_PASSWORD
+        fromDatabase: { name: sakha-db, property: password }
+      - key: QUEUE_CONNECTION
+        value: database
+      - key: CACHE_STORE
+        value: database
+
+  # -------------------------------------------------------------- scheduler ---
+  - type: worker
+    name: sakha-scheduler
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./sakha-finance/Dockerfile
+    dockerContext: ./sakha-finance
+    dockerCommand: start.sh scheduler
+    autoDeploy: true
+    envVars:
+      - key: APP_NAME
+        value: "SAKHA Finance Operations"
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_TIMEZONE
+        value: Asia/Jakarta
+      - key: APP_KEY
+        sync: false
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        fromDatabase: { name: sakha-db, property: host }
+      - key: DB_PORT
+        fromDatabase: { name: sakha-db, property: port }
+      - key: DB_DATABASE
+        fromDatabase: { name: sakha-db, property: database }
+      - key: DB_USERNAME
+        fromDatabase: { name: sakha-db, property: user }
+      - key: DB_PASSWORD
+        fromDatabase: { name: sakha-db, property: password }
+      - key: QUEUE_CONNECTION
+        value: database
+      - key: CACHE_STORE
+        value: database

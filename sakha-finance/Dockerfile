@@ -46,8 +46,7 @@ RUN apk add --no-cache \
         freetype-dev \
         bash \
         curl \
-        nodejs \
-        npm \
+        unzip \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
         pdo_pgsql \
@@ -59,6 +58,10 @@ RUN apk add --no-cache \
         bcmath \
         opcache
 
+# Composer is needed here to regenerate the autoloader once the full app tree is
+# present (the vendor stage only sees composer.json/lock).
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
 WORKDIR /var/www/html
 
 # Application code + vendor from the build stages.
@@ -68,15 +71,16 @@ COPY --from=vendor /app/vendor ./vendor
 RUN rm -rf public/assets public/index.html \
     && cp -r /spa/dist/. ./public/
 
-# Re-run the composer autoload/package discovery now that the app is present.
+# Re-run the autoloader now that app code is present.
+ENV COMPOSER_ALLOW_SUPERUSER=1
 RUN composer dump-autoload --optimize --no-dev --no-interaction
 
 # Writable dirs Laravel needs at runtime.
-RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache \
+RUN mkdir -p storage/framework/cache/data storage/framework/sessions storage/framework/views \
+        storage/logs bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
-# The start script runs migrations, then launches the web server; the platform
-# can run the same image with `worker` / `scheduler` as the command.
+# Container entrypoint (web / worker / scheduler modes).
 COPY docker/start.sh /usr/local/bin/start.sh
 RUN chmod +x /usr/local/bin/start.sh
 

@@ -2,8 +2,8 @@
 
 > **Mengapa bukan Vercel?** Vercel tidak mendukung runtime PHP, PostgreSQL
 > persisten, queue worker, maupun scheduler — semuanya dibutuhkan oleh aplikasi
-> ini. Karena itu deploy memakai satu host yang mendukung Docker: **Railway**
-> (alternatif: Render, Fly.io, VPS).
+> ini. Karena itu deploy memakai host yang mendukung Docker: **Render**
+> (disarankan, gratis) atau Railway / Fly.io / VPS.
 
 Aplikasi dijalankan sebagai **satu image** dengan tiga proses:
 
@@ -15,24 +15,73 @@ Aplikasi dijalankan sebagai **satu image** dengan tiga proses:
 
 ---
 
-## Opsi A — Railway (disarankan, paling cepat)
+## Opsi A — Render (disarankan, gratis, 1 klik)
 
-### 1. Siapkan repository
-Push project ke GitHub (folder `sakha-finance/` adalah root aplikasi).
-Tambahkan juga **Dockerfile**, `railway.json`, dan `docker/start.sh` (sudah ada di repo).
+Repo sudah menyertakan **`render.yaml`** (Blueprint) yang membuat **semua** service
+sekaligus: web + queue worker + scheduler + PostgreSQL.
 
-### 2. Buat project di Railway
+### 1. Deploy lewat Blueprint
+
+1. Buka <https://dashboard.render.com/blueprints> → **New Blueprint Instance**.
+2. Hubungkan akun GitHub dan pilih repo `RaliqID/ProjectPKL`.
+3. Render membaca `sakha-finance/render.yaml` dan menampilkan daftar service:
+   - `sakha-finance` (Web, Docker)
+   - `sakha-worker` (Background Worker)
+   - `sakha-scheduler` (Background Worker)
+   - `sakha-db` (PostgreSQL, gratis)
+4. Klik **Apply**. Render membuat database, mengisi kredensial DB ke semua
+   service secara otomatis, lalu build & deploy.
+
+> **Root Directory:** jika Render meminta, set ke `sakha-finance`
+> (Blueprint sudah menunjuk `dockerContext: ./sakha-finance`).
+
+### 2. Setelah deploy pertama
+
+1. Buka service **sakha-finance** → salin URL-nya
+   (mis. `https://sakha-finance.onrender.com`).
+2. Masuk **Environment** → tambahkan:
+   ```
+   APP_URL=https://sakha-finance.onrender.com
+   ```
+   (WAJIB — kalau salah, cookie sesi & asset path bermasalah.)
+3. (Opsional, untuk email sungguhan) ganti `MAIL_MAILER` ke `smtp` dan isi:
+   ```
+   MAIL_MAILER=smtp
+   MAIL_HOST=sandbox.smtp.mailtrap.io
+   MAIL_PORT=2525
+   MAIL_USERNAME=<username-mailtrap>
+   MAIL_PASSWORD=<password-mailtrap>
+   ```
+4. Simpan → Render redeploy otomatis.
+
+### 3. Data awal
+
+`start.sh` sudah otomatis:
+- menjalankan **migrasi** (`php artisan migrate --force`),
+- **mengisi data contoh** kalau database masih kosong (`db:seed`),
+- membuat berkas PDF contoh.
+
+Jadi setelah deploy selesai, tinggal buka URL dan login dengan
+`admin@sakha.test` / `password`.
+
+> **Catatan paket gratis Render:** service gratis "tidur" setelah ~15 menit tanpa
+> trafik dan bangun lagi saat diakses (butuh ±30 detik). Database gratis punya
+> masa aktif terbatas. Cukup untuk demo/presentasi; upgrade bila perlu selalu hidup.
+
+---
+
+## Opsi B — Railway
+
+Repo juga menyertakan **`railway.json`**. Langkah:
+
+### 1. Buat project di Railway
 1. Buka <https://railway.app> → **New Project** → **Deploy from GitHub repo**.
-2. Pilih repo `ProjectPKL`.
-3. Set **Root Directory** ke `sakha-finance`.
-4. Railway akan mendeteksi `Dockerfile` dan mulai build.
+2. Pilih repo `ProjectPKL`, set **Root Directory** = `sakha-finance`.
+3. Railway mendeteksi `Dockerfile` dan mulai build.
 
-### 3. Tambah database PostgreSQL
-1. Di project yang sama: **New** → **Database** → **Add PostgreSQL**.
-2. Railway otomatis menyediakan variabel `DATABASE_URL` /
-   `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`.
-3. Buka service aplikasi → **Variables** → tambahkan referensi:
-
+### 2. Tambah database PostgreSQL
+1. **New** → **Database** → **Add PostgreSQL**.
+2. Di service aplikasi → **Variables**, tambahkan referensi:
 ```
 DB_CONNECTION=pgsql
 DB_HOST=${{Postgres.PGHOST}}
@@ -42,77 +91,32 @@ DB_USERNAME=${{Postgres.PGUSER}}
 DB_PASSWORD=${{Postgres.PGPASSWORD}}
 ```
 
-### 4. Set variabel aplikasi
-Di service aplikasi → **Variables**, tambahkan:
-
+### 3. Set variabel aplikasi
 ```
 APP_NAME="SAKHA Finance Operations"
 APP_ENV=production
 APP_DEBUG=false
-APP_KEY=base64:xxxxxxxx   # generate lokal: php artisan key:generate --show
+APP_KEY=base64:xxxxxxxx   # php artisan key:generate --show
 APP_TIMEZONE=Asia/Jakarta
 APP_URL=https://<domain-railway-anda>
 APP_LOCALE=id
 APP_FALLBACK_LOCALE=id
-
 SESSION_DRIVER=database
 SESSION_SECURE_COOKIE=true
 QUEUE_CONNECTION=database
 CACHE_STORE=database
-
-MAIL_MAILER=smtp
-MAIL_HOST=sandbox.smtp.mailtrap.io
-MAIL_PORT=2525
-MAIL_USERNAME=<username-mailtrap>
-MAIL_PASSWORD=<password-mailtrap>
+MAIL_MAILER=log           # ganti ke smtp bila perlu email sungguhan
 MAIL_FROM_ADDRESS="noreply@sakha.test"
 ```
 
-> **APP_KEY:** hasilkan sekali secara lokal lalu tempel:
-> ```powershell
-> php artisan key:generate --show
-> ```
+### 4. Tambah worker & scheduler
+Buat dua service lagi dari repo yang sama:
+- **Custom Start Command:** `start.sh worker` (worker)
+- **Custom Start Command:** `start.sh scheduler` (scheduler)
+- Salin semua Variables ke keduanya.
 
-### 5. Deploy
-Railway otomatis build & deploy. Setelah selesai:
-1. Buka **Settings → Networking → Generate Domain** → dapat URL seperti
-   `https://sakha-finance-production.up.railway.app`.
-2. Isi `APP_URL` dengan URL tersebut (agar cookie & asset path benar), lalu redeploy.
-
-### 6. Tambah worker & scheduler
-Di project yang sama, **New** → **Deploy from GitHub repo** (repo yang sama),
-lalu pada masing-masing service:
-- **Settings → Build** → Dockerfile path `sakha-finance/Dockerfile`
-- **Settings → Deploy → Custom Start Command:**
-  - Service *worker*: `start.sh worker`
-  - Service *scheduler*: `start.sh scheduler`
-- Salin semua **Variables** aplikasi (DB + APP_*) ke keduanya
-  (Railway bisa pakai *Shared Variables* / *Variable Reference*).
-
-### 7. Isi data awal (sekali saja)
-Buka **Railway → service web → Shell** (atau `railway run`):
-
-```bash
-php artisan migrate --force
-php artisan db:seed --force
-php artisan sakha:regenerate-documents
-```
-
-Selesai — buka URL-nya, login dengan `admin@sakha.test` / `password`.
-
----
-
-## Opsi B — Render
-
-1. **New → Web Service** → connect repo → **Runtime: Docker**.
-2. Root directory: `sakha-finance`.
-3. **New → PostgreSQL** (Render menyediakan *Internal Database URL*).
-4. Set variabel sama seperti langkah Railway (pakai kredensial DB Render).
-5. Start command: `start.sh web`.
-6. Tambah **Background Worker** (start `start.sh worker`) dan
-   **Cron Job** (`start.sh scheduler`).
-
----
+### 5. Generate domain
+**Settings → Networking → Generate Domain**, lalu isi `APP_URL` dengan URL itu.
 
 ## Opsi C — VPS (Docker Compose)
 

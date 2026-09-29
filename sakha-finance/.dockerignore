@@ -1,0 +1,39 @@
+# Build context exclusions — keeps the image small and the build fast.
+# The runtime stage installs vendor/ via the composer stage and the SPA is
+# built from source, so neither needs to be sent from the host.
+
+# Dependencies (reinstalled inside the image)
+/vendor
+/spa/node_modules
+
+# Built SPA output (rebuilt inside the image)
+/public/assets
+/public/index.html
+
+# Local / dev-only files
+.env
+.env.*
+!.env.example
+/.devport
+/.tunnelurl
+/node_modules
+/storage/logs/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/app/private/*
+/bootstrap/cache/*.php
+
+# VCS + editor + OS noise
+/.git
+/.gitignore
+/.gitattributes
+/.idea
+/.vscode
+.DS_Store
+Thumbs.db
+
+# Docs (not needed at runtime)
+/*.md
+/docs
+/presentation
