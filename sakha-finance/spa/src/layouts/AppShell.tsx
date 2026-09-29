@@ -31,6 +31,7 @@ import { LiveIndicator } from '@/components/LiveIndicator'
 import { Logo } from '@/components/Logo'
 import { RoleBadge } from '@/components/RoleBadge'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { Footer } from '@/components/Footer'
 
 interface NavItem {
   to: string
@@ -219,8 +220,11 @@ export function AppShell() {
 
         {notifOpen ? <NotificationPanel onClose={() => setNotifOpen(false)} /> : null}
 
-        <main id="main" className="min-h-[calc(100vh-3.5rem)]">
-          <Outlet />
+        <main id="main" className="flex min-h-[calc(100vh-3.5rem)] flex-col">
+          <div className="flex-1">
+            <Outlet />
+          </div>
+          <Footer variant="app" />
         </main>
       </div>
     </div>

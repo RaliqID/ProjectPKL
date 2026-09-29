@@ -16,6 +16,7 @@ import {
 import { useAuth } from '@/lib/auth'
 import { Reveal } from '@/components/Reveal'
 import { Logo } from '@/components/Logo'
+import { Footer as AppFooter } from '@/components/Footer'
 import { ThemeToggle } from '@/components/ThemeToggle'
 
 /*
@@ -346,23 +347,7 @@ function ClosingCta() {
 /* -------------------------------------------------------------- Footer --- */
 
 function Footer() {
-  return (
-    <footer className="border-t border-ink-200 bg-ink-50">
-      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-5 py-10 lg:flex-row lg:items-start lg:justify-between lg:px-8">
-        <div className="max-w-md">
-          <Logo size="md" withTagline />
-          <p className="mt-4 text-xs leading-relaxed text-ink-500">
-            Sistem Informasi Pengelolaan Data dan Dokumen Finance — prototype pengembangan berdasarkan kegiatan PKL di
-            PT. Sakha Internasional.
-          </p>
-        </div>
-        <p className="text-xs leading-relaxed text-ink-400 lg:max-w-sm">
-          Bukan sistem produksi resmi perusahaan. Seluruh data yang ditampilkan bersifat contoh dan tidak
-          merepresentasikan data perusahaan.
-        </p>
-      </div>
-    </footer>
-  )
+  return <AppFooter variant="landing" />
 }
 
 /* --------------------------------------------------------------- Page ---- */
