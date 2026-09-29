@@ -4,6 +4,7 @@ import {
   ClipboardCheck,
   Download,
   FileDown,
+  FileSpreadsheet,
   FileText,
   Fuel,
   Mail,
@@ -26,13 +27,11 @@ import { useAuth } from '@/lib/auth'
  */
 
 interface ReportDef {
+  /** Report type, also the API path segment: /api/reports/{key}/{format}. */
   key: string
   title: string
   description: string
   icon: typeof Receipt
-  pdfUrl: string
-  csvUrl?: string
-  emailType: string
 }
 
 const REPORTS: ReportDef[] = [
@@ -41,54 +40,36 @@ const REPORTS: ReportDef[] = [
     title: 'Transaksi',
     description: 'Daftar transaksi beserta status dan nilainya.',
     icon: Receipt,
-    pdfUrl: '/api/reports/transactions/pdf',
-    csvUrl: '/api/reports/transactions/export',
-    emailType: 'transactions',
   },
   {
     key: 'invoices',
     title: 'Invoice',
     description: 'Invoice dengan jatuh tempo dan status pembayaran.',
     icon: FileText,
-    pdfUrl: '/api/reports/invoices/pdf',
-    csvUrl: '/api/reports/invoices/export',
-    emailType: 'invoices',
   },
   {
     key: 'archives',
     title: 'Arsip Dokumen',
     description: 'Dokumen tersimpan per jenis, pelanggan, dan lokasi arsip.',
     icon: Archive,
-    pdfUrl: '/api/reports/archives/pdf',
-    csvUrl: '/api/reports/archives/export',
-    emailType: 'archives',
   },
   {
     key: 'expenses',
     title: 'Pengeluaran',
     description: 'Pengeluaran operasional termasuk klaim bensin (BBM).',
     icon: Fuel,
-    pdfUrl: '/api/reports/expenses/pdf',
-    csvUrl: '/api/reports/expenses/export',
-    emailType: 'expenses',
   },
   {
     key: 'procurements',
     title: 'Pengadaan & SPB',
     description: 'Catatan pengadaan barang dan Buku SPB.',
     icon: ShoppingCart,
-    pdfUrl: '/api/reports/procurements/pdf',
-    csvUrl: '/api/reports/procurements/export',
-    emailType: 'procurements',
   },
   {
     key: 'ketelitian',
     title: 'Pemeriksaan Ketelitian',
     description: 'Hasil pemeriksaan ketelitian data transaksi & invoice.',
     icon: ClipboardCheck,
-    pdfUrl: '/api/reports/ketelitian/pdf',
-    csvUrl: '/api/reports/ketelitian/export',
-    emailType: 'ketelitian',
   },
 ]
 
@@ -97,21 +78,20 @@ export function ReportsPage() {
   const { user } = useAuth()
   const [busy, setBusy] = useState<string | null>(null)
 
-  async function run(report: ReportDef, kind: 'pdf' | 'csv' | 'email') {
+  async function run(report: ReportDef, kind: 'pdf' | 'excel' | 'csv' | 'email') {
     const id = `${report.key}:${kind}`
     setBusy(id)
     try {
       if (kind === 'email') {
-        const res = await api.post<{ message: string }>('/api/reports/email', { type: report.emailType })
+        const res = await api.post<{ message: string }>('/api/reports/email', { type: report.key })
         toast.success(res.message)
       } else {
-        const url = kind === 'pdf' ? report.pdfUrl : report.csvUrl!
-        const ext = kind === 'pdf' ? 'pdf' : 'csv'
-        await downloadFile(url, `laporan-${report.key}.${ext}`)
+        const ext = kind === 'excel' ? 'xlsx' : kind
+        await downloadFile(`/api/reports/${report.key}/${kind}`, `laporan-${report.key}.${ext}`)
         toast.success(`Laporan ${report.title} (${ext.toUpperCase()}) diunduh.`)
       }
-    } catch {
-      toast.error('Gagal memproses laporan.')
+    } catch (err) {
+      toast.error('Gagal memproses laporan.', err instanceof Error ? err.message : undefined)
     } finally {
       setBusy(null)
     }
@@ -149,6 +129,15 @@ export function ReportsPage() {
                 </div>
 
                 <div className="mt-4 flex flex-wrap gap-2 pt-4 border-t border-ink-100">
+                  <Button
+                    variant="secondary"
+                    className="px-2.5 py-1.5 text-xs"
+                    disabled={busy !== null}
+                    onClick={() => run(report, 'excel')}
+                  >
+                    <FileSpreadsheet className="h-3.5 w-3.5" />
+                    {busy === `${report.key}:excel` ? 'Menyiapkan…' : 'Excel'}
+                  </Button>
                   <Button
                     variant="secondary"
                     className="px-2.5 py-1.5 text-xs"

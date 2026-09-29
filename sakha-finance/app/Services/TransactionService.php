@@ -185,8 +185,6 @@ class TransactionService
         return $transaction->refresh();
     }
 
-    // ---- money helpers (bcmath, no float drift) ----
-
     public function money(mixed $value): string
     {
         return number_format((float) $value, 2, '.', '');

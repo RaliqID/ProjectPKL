@@ -38,6 +38,34 @@ export function ChartCard({ title, subtitle, children, footer }: ChartFrameProps
   )
 }
 
+/** Shared SVG frame: every chart draws in the same responsive, scaled viewBox. */
+function ChartSvg({
+  height,
+  label,
+  width = 100,
+  className = 'w-full',
+  children,
+}: {
+  height: number
+  label: string
+  width?: number
+  className?: string
+  children: React.ReactNode
+}) {
+  return (
+    <svg
+      viewBox={`0 0 ${width} ${height}`}
+      preserveAspectRatio="none"
+      className={className}
+      style={{ height, width: '100%' }}
+      role="img"
+      aria-label={label}
+    >
+      {children}
+    </svg>
+  )
+}
+
 /**
  * A filled area + line chart, for a single measure over time (e.g. revenue).
  */
@@ -75,14 +103,7 @@ export function AreaChart({
 
   return (
     <div>
-      <svg
-        viewBox={`0 0 ${width} ${height}`}
-        preserveAspectRatio="none"
-        className="w-full"
-        style={{ height }}
-        role="img"
-        aria-label="Trend chart"
-      >
+      <ChartSvg height={height} label="Trend chart">
         <defs>
           <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor={fill} stopOpacity="0.9" />
@@ -99,7 +120,7 @@ export function AreaChart({
           strokeLinecap="round"
           vectorEffect="non-scaling-stroke"
         />
-      </svg>
+      </ChartSvg>
       <AxisLabels data={data} />
       <div className="mt-2 flex justify-between text-2xs text-ink-400">
         <span>peak {formatValue(max)}</span>
@@ -109,52 +130,73 @@ export function AreaChart({
   )
 }
 
+interface BarSeries {
+  name: string
+  color: string
+  values: number[]
+}
+
+interface BarChartProps {
+  categories: string[]
+  series: BarSeries[]
+  height?: number
+  formatValue?: (v: number) => string
+}
+
+/**
+ * Shared frame for the two bar charts: the empty guard, the responsive SVG, and
+ * the axis + legend beneath it. Each chart only supplies the bars themselves.
+ */
+function BarChartShell({
+  categories,
+  series,
+  height,
+  formatValue,
+  label,
+  children,
+}: BarChartProps & { label: string; children: React.ReactNode }) {
+  if (categories.length === 0) return <ChartEmpty />
+
+  return (
+    <div>
+      <ChartSvg height={height ?? 200} label={label}>
+        {children}
+      </ChartSvg>
+      <AxisLabels labels={categories} />
+      <Legend series={series} formatValue={formatValue ?? ((v) => String(v))} />
+    </div>
+  )
+}
+
 /**
  * Grouped vertical bars, for comparing 2–3 measures per period
  * (e.g. completed vs needs-review transactions, or uploaded vs verified docs).
  */
-export function GroupedBarChart({
-  categories,
-  series,
-  height = 200,
-  formatValue = (v: number) => String(v),
-}: {
-  categories: string[]
-  series: { name: string; color: string; values: number[] }[]
-  height?: number
-  formatValue?: (v: number) => string
-}) {
-  if (categories.length === 0) return <ChartEmpty />
-
+export function GroupedBarChart({ categories, series, height = 200, formatValue = (v) => String(v) }: BarChartProps) {
   const max = Math.max(...series.flatMap((s) => s.values), 1)
   const groupWidth = 100 / categories.length
   const barGap = 1.5
   const barWidth = (groupWidth - barGap * (series.length + 1)) / series.length
 
   return (
-    <div>
-      <svg
-        viewBox={`0 0 100 ${height}`}
-        preserveAspectRatio="none"
-        className="w-full"
-        style={{ height }}
-        role="img"
-        aria-label="Comparison chart"
-      >
-        {categories.map((_, ci) => {
-          const groupX = ci * groupWidth
-          return series.map((s, si) => {
-            const v = s.values[ci] ?? 0
-            const barH = (v / max) * (height - 8)
-            const x = groupX + barGap * (si + 1) + barWidth * si
-            const y = height - barH
-            return <rect key={`${ci}-${si}`} x={x} y={y} width={barWidth} height={barH} fill={s.color} rx="0.6" />
-          })
-        })}
-      </svg>
-      <AxisLabels labels={categories} />
-      <Legend series={series} formatValue={formatValue} />
-    </div>
+    <BarChartShell
+      categories={categories}
+      series={series}
+      height={height}
+      formatValue={formatValue}
+      label="Comparison chart"
+    >
+      {categories.map((_, ci) => {
+        const groupX = ci * groupWidth
+        return series.map((s, si) => {
+          const v = s.values[ci] ?? 0
+          const barH = (v / max) * (height - 8)
+          const x = groupX + barGap * (si + 1) + barWidth * si
+          const y = height - barH
+          return <rect key={`${ci}-${si}`} x={x} y={y} width={barWidth} height={barH} fill={s.color} rx="0.6" />
+        })
+      })}
+    </BarChartShell>
   )
 }
 
@@ -162,48 +204,31 @@ export function GroupedBarChart({
  * Stacked bars for a part-to-whole breakdown per period
  * (e.g. verification pass / warning / failed).
  */
-export function StackedBarChart({
-  categories,
-  series,
-  height = 200,
-  formatValue = (v: number) => String(v),
-}: {
-  categories: string[]
-  series: { name: string; color: string; values: number[] }[]
-  height?: number
-  formatValue?: (v: number) => string
-}) {
-  if (categories.length === 0) return <ChartEmpty />
-
+export function StackedBarChart({ categories, series, height = 200, formatValue = (v) => String(v) }: BarChartProps) {
   const totals = categories.map((_, i) => series.reduce((sum, s) => sum + (s.values[i] ?? 0), 0))
   const max = Math.max(...totals, 1)
   const groupWidth = 100 / categories.length
   const barWidth = groupWidth * 0.5
 
   return (
-    <div>
-      <svg
-        viewBox={`0 0 100 ${height}`}
-        preserveAspectRatio="none"
-        className="w-full"
-        style={{ height }}
-        role="img"
-        aria-label="Breakdown chart"
-      >
-        {categories.map((_, ci) => {
-          const groupX = ci * groupWidth + (groupWidth - barWidth) / 2
-          let cursor = height
-          return series.map((s, si) => {
-            const v = s.values[ci] ?? 0
-            const barH = (v / max) * (height - 8)
-            cursor -= barH
-            return <rect key={`${ci}-${si}`} x={groupX} y={cursor} width={barWidth} height={barH} fill={s.color} rx="0.4" />
-          })
-        })}
-      </svg>
-      <AxisLabels labels={categories} />
-      <Legend series={series} formatValue={formatValue} />
-    </div>
+    <BarChartShell
+      categories={categories}
+      series={series}
+      height={height}
+      formatValue={formatValue}
+      label="Breakdown chart"
+    >
+      {categories.map((_, ci) => {
+        const groupX = ci * groupWidth + (groupWidth - barWidth) / 2
+        let cursor = height
+        return series.map((s, si) => {
+          const v = s.values[ci] ?? 0
+          const barH = (v / max) * (height - 8)
+          cursor -= barH
+          return <rect key={`${ci}-${si}`} x={groupX} y={cursor} width={barWidth} height={barH} fill={s.color} rx="0.4" />
+        })
+      })}
+    </BarChartShell>
   )
 }
 
@@ -346,14 +371,7 @@ export function Sparkline({
   })
 
   return (
-    <svg
-      viewBox={`0 0 ${width} ${height}`}
-      preserveAspectRatio="none"
-      className={className}
-      style={{ height, width: '100%' }}
-      role="img"
-      aria-label="Tren"
-    >
+    <ChartSvg height={height} width={width} label="Tren" className={className ?? 'w-full'}>
       <polyline
         points={points.join(' ')}
         fill="none"
@@ -363,6 +381,6 @@ export function Sparkline({
         strokeLinecap="round"
         vectorEffect="non-scaling-stroke"
       />
-    </svg>
+    </ChartSvg>
   )
 }

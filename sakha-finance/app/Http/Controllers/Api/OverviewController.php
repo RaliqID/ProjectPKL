@@ -27,7 +27,6 @@ class OverviewController extends Controller
         $now = now();
         $monthStart = $now->copy()->startOfMonth();
 
-        // --- Metric cards (real queries, no hardcoded numbers) ---
         $metrics = [
             'total_transactions' => Transaction::count(),
             'transactions_this_month' => Transaction::where('transaction_date', '>=', $monthStart)->count(),
@@ -41,7 +40,6 @@ class OverviewController extends Controller
             ])->count(),
             'verification_failures' => Transaction::whereHas('latestVerificationRun', fn ($q) => $q->where('failed_count', '>', 0))->count(),
 
-            // --- Finance-focused counters for Beranda ---
             'invoices_total' => Invoice::count(),
             'invoices_unpaid' => Invoice::whereIn('status', [
                 InvoiceStatus::ISSUED, InvoiceStatus::PARTIALLY_PAID, InvoiceStatus::OVERDUE,
@@ -51,7 +49,6 @@ class OverviewController extends Controller
             'documents_archived' => Document::where('status', DocumentStatus::ARCHIVED)->count(),
             'documents_total' => Document::count(),
 
-            // --- Pengiriman / resi (Finance view) ---
             'deliveries_total' => Delivery::count(),
             'deliveries_missing_receipt' => Delivery::whereNull('receipt_number')->whereNull('tracking_number')->count(),
             'deliveries_missing_handover' => Delivery::whereNull('handover_number')->count(),

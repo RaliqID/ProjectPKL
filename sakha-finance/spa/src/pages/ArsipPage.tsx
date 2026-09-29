@@ -58,8 +58,8 @@ export function ArsipPage() {
       if (year) qs.set('year', year)
       await downloadFile(`/api/reports/archives/export${qs.toString() ? `?${qs}` : ''}`, 'laporan-arsip.csv')
       toast.success('Laporan arsip diunduh.')
-    } catch {
-      toast.error('Gagal mengunduh laporan arsip.')
+    } catch (err) {
+      toast.error('Gagal mengunduh laporan arsip.', err instanceof Error ? err.message : undefined)
     } finally {
       setExporting(false)
     }
@@ -73,8 +73,8 @@ export function ArsipPage() {
       if (year) qs.set('year', year)
       await downloadFile(`/api/reports/archives/pdf${qs.toString() ? `?${qs}` : ''}`, 'laporan-arsip.pdf')
       toast.success('Laporan PDF diunduh.')
-    } catch {
-      toast.error('Gagal mengunduh PDF.')
+    } catch (err) {
+      toast.error('Gagal mengunduh PDF.', err instanceof Error ? err.message : undefined)
     } finally {
       setPdfLoading(false)
     }
@@ -85,8 +85,8 @@ export function ArsipPage() {
     try {
       const res = await api.post<{ message: string }>('/api/reports/email', { type: 'archives' })
       toast.success(res.message)
-    } catch {
-      toast.error('Gagal mengirim laporan.')
+    } catch (err) {
+      toast.error('Gagal mengirim laporan.', err instanceof Error ? err.message : undefined)
     } finally {
       setEmailing(false)
     }
@@ -324,8 +324,8 @@ function DetailModal({ row, onClose }: { row: ArchiveRow | null; onClose: () => 
     setDownloading(true)
     try {
       await downloadFile(`/api/documents/${row.document_id}/download`, row.file_name ?? 'dokumen.pdf')
-    } catch {
-      toast.error('Gagal mengunduh dokumen.')
+    } catch (err) {
+      toast.error('Gagal mengunduh dokumen.', err instanceof Error ? err.message : undefined)
     } finally {
       setDownloading(false)
     }

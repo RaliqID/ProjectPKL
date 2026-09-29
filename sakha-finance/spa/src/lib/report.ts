@@ -3,8 +3,8 @@
  *
  * One place decides what is logged and what the user is told.
  *
- * The problem this solves: `catch { toast.error('Could not save') }` reads as
- * handled, but the cause is gone. Nothing is recorded, so a report of "it didn't
+ * The problem this solves: a handler that shows an error to the user but drops
+ * the cause reads as handled, yet nothing is recorded, so a report of "it didn't
  * work" cannot be investigated. Four call sites in this app did exactly that.
  *
  * The rules:

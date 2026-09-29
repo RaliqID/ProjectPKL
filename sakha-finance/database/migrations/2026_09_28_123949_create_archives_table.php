@@ -5,14 +5,9 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * Arsip — digital archive of Finance documents.
- *
- * Represents the physical/digital filing workflow (scan → rename → classify →
- * store → filling → search). Each row is one archived document with enough
- * metadata to be located again by year, month, type and customer/vendor.
- *
- * A document may or may not be linked to a transaction: supporting documents
- * such as purchase invoices or journals often arrive on their own.
+ * Arsip: the digital archive of Finance documents (scan, rename, classify,
+ * store, filling, search). Rows are keyed by year/month/type/customer so a
+ * filed document can be found again.
  */
 return new class extends Migration
 {

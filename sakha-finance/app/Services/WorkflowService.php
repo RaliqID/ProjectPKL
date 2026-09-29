@@ -88,22 +88,21 @@ class WorkflowService
             \App\Enums\TransactionStatus::DELIVERED,
         ];
         if (! in_array($transaction->status, $allowedStages, true)) {
-            $reasons[] = 'Transaction has not reached a delivery-ready stage yet.';
+            $reasons[] = 'Transaksi belum mencapai tahap siap kirim.';
         }
 
         if (! $transaction->isFullyPaid()) {
-            $reasons[] = 'Payment is not fully settled.';
+            $reasons[] = 'Pembayaran belum lunas.';
         }
 
         $delivery = $transaction->deliveries->sortByDesc('id')->first();
         if (! $delivery) {
-            $reasons[] = 'Delivery record is missing.';
+            $reasons[] = 'Data pengiriman belum ada.';
         } elseif ($delivery->status !== DeliveryStatus::DELIVERED) {
-            $reasons[] = 'Delivery has not been marked as DELIVERED.';
+            $reasons[] = 'Pengiriman belum ditandai TERKIRIM.';
         }
 
-        // Required documents are evaluated by the same stage-aware rule used by
-        // the verification engine, so the two never disagree.
+        // Same rule the verification engine uses, so the two never disagree.
         $docRule = new \App\Services\Verification\Rules\RequiredDocumentsRule;
         $docResult = $docRule->evaluate($transaction);
         if ($docResult->status === \App\Enums\VerificationStatus::FAILED) {
@@ -111,13 +110,13 @@ class WorkflowService
         }
 
         // Latest verification must not contain failures. If no run exists yet, we
-        // report it as a reason rather than silently running verification here —
+        // report it as a reason rather than silently running verification here;
         // evaluating the completion gate must never mutate workflow state.
         $run = $transaction->latestVerificationRun;
         if (! $run) {
-            $reasons[] = 'Verification has not been run yet.';
+            $reasons[] = 'Verifikasi belum dijalankan.';
         } elseif ($run->failed_count > 0) {
-            $reasons[] = "Verification has {$run->failed_count} failed check(s).";
+            $reasons[] = "Verifikasi memiliki {$run->failed_count} pemeriksaan yang tidak sesuai.";
         }
 
         return ['allowed' => empty($reasons), 'reasons' => $reasons];

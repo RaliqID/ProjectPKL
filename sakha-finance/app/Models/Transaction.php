@@ -95,8 +95,6 @@ class Transaction extends Model
             ->latest();
     }
 
-    // ---- Financial helpers (integer-safe via bcmath on decimal strings) ----
-
     public function confirmedPaidAmount(): string
     {
         $sum = $this->payments

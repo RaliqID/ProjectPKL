@@ -69,10 +69,7 @@ export function useLiveData({ intervalMs = 15000 }: { intervalMs?: number } = {}
   return { lastUpdated, isRefreshing, secondsAgo } satisfies LiveState
 }
 
-/**
- * Refresh (invalidate) every operational query. Used by explicit "Refresh"
- * buttons and after mutations so the whole workspace stays consistent.
- */
+/** Invalidate every operational query (Refresh button, after mutations). */
 export function useRefreshAll() {
   const qc = useQueryClient()
   const [isRefreshing, setIsRefreshing] = useState(false)

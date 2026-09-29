@@ -86,8 +86,8 @@ export function PengeluaranPage() {
       if (status) qs.set('status', status)
       await downloadFile(`/api/reports/expenses/export${qs.toString() ? `?${qs}` : ''}`, 'pengeluaran.csv')
       toast.success('Laporan diunduh.')
-    } catch {
-      toast.error('Gagal mengunduh laporan.')
+    } catch (err) {
+      toast.error('Gagal mengunduh laporan.', err instanceof Error ? err.message : undefined)
     } finally {
       setExporting(false)
     }
@@ -102,8 +102,8 @@ export function PengeluaranPage() {
       if (dateTo) qs.set('date_to', dateTo)
       await downloadFile(`/api/reports/expenses/pdf${qs.toString() ? `?${qs}` : ''}`, 'laporan-pengeluaran.pdf')
       toast.success('Laporan PDF diunduh.')
-    } catch {
-      toast.error('Gagal mengunduh PDF.')
+    } catch (err) {
+      toast.error('Gagal mengunduh PDF.', err instanceof Error ? err.message : undefined)
     } finally {
       setPdfLoading(false)
     }
@@ -114,8 +114,8 @@ export function PengeluaranPage() {
     try {
       const res = await api.post<{ message: string }>('/api/reports/email', { type: 'expenses' })
       toast.success(res.message)
-    } catch {
-      toast.error('Gagal mengirim laporan.')
+    } catch (err) {
+      toast.error('Gagal mengirim laporan.', err instanceof Error ? err.message : undefined)
     } finally {
       setEmailing(false)
     }

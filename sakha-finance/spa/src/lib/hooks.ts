@@ -15,8 +15,6 @@ import type {
   VerificationRun,
 } from '@/types/api'
 
-// ---- Queries ----
-
 export function useOverview() {
   return useQuery({
     queryKey: ['overview'],
@@ -202,8 +200,6 @@ export interface UserRow {
   is_active: boolean
   created_at: string
 }
-
-// ---- Mutations ----
 
 export function useInvalidate() {
   const qc = useQueryClient()
@@ -423,8 +419,6 @@ export function useUpdateUser() {
   })
 }
 
-// ---- Invoice (Finance-level listing) ----
-
 export function useInvoices(filters: Record<string, unknown> = {}) {
   return useQuery({
     queryKey: ['invoices', filters],
@@ -454,8 +448,6 @@ export interface PaginationMeta {
   per_page: number
   total: number
 }
-
-// ---- Arsip (digital archive) ----
 
 export function useArchives(filters: Record<string, unknown> = {}) {
   return useQuery({
@@ -525,8 +517,6 @@ export function useSyncArchives() {
   })
 }
 
-// ---- Pemeriksaan Ketelitian (accuracy checking) ----
-
 export function useKetelitian(filters: Record<string, unknown> = {}) {
   return useQuery({
     queryKey: ['ketelitian', filters],
@@ -559,8 +549,6 @@ export interface AccuracyRow {
   checks: AccuracyCheck[]
 }
 
-// ---- Pencocokan Pembayaran (payment matching) ----
-
 export function usePaymentMatching(filters: Record<string, unknown> = {}) {
   return useQuery({
     queryKey: ['payment-matching', filters],
@@ -582,8 +570,6 @@ export interface PaymentMatchRow {
   status_label: string
   note: string
 }
-
-// ---- Pengeluaran (expenses) ----
 
 export function useExpenses(filters: Record<string, unknown> = {}) {
   return useQuery({
@@ -631,8 +617,6 @@ export function useExpenseStatus() {
     onSuccess: () => inv.all(),
   })
 }
-
-// ---- Pengadaan + SPB (procurement) ----
 
 export function useProcurements(filters: Record<string, unknown> = {}) {
   return useQuery({

@@ -53,24 +53,40 @@ php artisan sakha:regenerate-documents
 - Scheduler terdaftar di `bootstrap/app.php` → `withSchedule()` (harian 07:00, mingguan Senin,
   bulanan tgl 1). Worker wajib jalan (`.\start-all.ps1` sudah menjalankannya).
 
-## Laporan PDF
+## Laporan (PDF / CSV / Excel)
 
-- Semua laporan PDF dibuat `ReportController::pdf()` dari satu template
-  `resources/views/reports/table.blade.php` (logo base64, nomor halaman, bar chart CSS).
-- dompdf **tidak** merender SVG/canvas — grafik dibuat dari div + lebar persen.
-- Orientasi: `landscape` untuk tabel lebar (Arsip, Pengadaan, Transaksi).
+- **Satu sumber data:** `FinanceReportBuilder` mendefinisikan setiap laporan (judul, header,
+  baris bertipe, ringkasan, tren). PDF, CSV, dan Excel merender data yang **sama**, jadi
+  kolom tidak mungkin berbeda antar format.
+- **Satu controller tipis:** `ReportController` hanya memilih format. Rute:
+  `/api/reports/{type}/{export|csv|excel|pdf}` dengan `{type}` salah satu dari
+  `transactions · invoices · archives · expenses · procurements · ketelitian`.
+- **PDF:** template `resources/views/reports/table.blade.php` (logo base64, nomor halaman,
+  bar chart CSS). dompdf **tidak** merender SVG — grafik dibuat dari div + lebar persen.
+  Orientasi `landscape` untuk tabel lebar.
+- **Excel:** `ExcelReportService` (PhpSpreadsheet). Buka rapi di Excel: band judul ber-brand,
+  baris header **dibekukan** + **auto-filter**, kolom bertipe (uang = angka `"Rp"#,##0`,
+  tanggal = serial Excel `dd/mm/yyyy`), dan **baris TOTAL** `=SUM(...)` untuk kolom uang.
+  Jangan menulis tanggal sebagai string; pakai `Date::PHPToExcel()`.
 
+## Email & laporan terjadwal
 
-## Struktur singkat
+- Konfigurasi SMTP ada di `.env` (`MAIL_MAILER=smtp`). Untuk demo dipakai **Mailtrap sandbox**;
+  ganti ke SMTP produksi bila perlu.
+- Uji kirim manual: `php artisan sakha:send-report monthly --sync` (tanpa `--sync` → masuk antrean).
+- Scheduler terdaftar di `bootstrap/app.php` → `withSchedule()` (harian 07:00, mingguan Senin,
+  bulanan tgl 1). Worker wajib jalan (`.\start-all.ps1` sudah menjalankannya).
 
-```
-app/Enums/          label status & tipe dokumen (Bahasa Indonesia)
-app/Services/       VerificationService, AccuracyService, PaymentMatchService, ...
-app/Http/Controllers/Api/   endpoint API
-spa/src/pages/      halaman per modul
-spa/src/components/ui/  komponen UI bersama (DataTable, Modal, Form, Charts, ...)
-spa/src/lib/status.ts   peta label status (frontend)
-```
+## Kualitas kode (aislop + antislop)
+
+- Jalankan `npx aislop scan .` sebelum commit; skor harus **tidak turun** dari baseline (97/100).
+- **Jangan** menambah komentar dekoratif/separator (`// --- Judul ---`) atau narasi
+  "sebelum/sesudah" — itu ditandai `ai-slop/narrative-comment`.
+- `catch` **wajib** memakai error yang ditangkap: `catch (err) { toast.error('…', err instanceof Error ? err.message : undefined) }`.
+  Jangan `catch { … }` tanpa error.
+- Blok kode berulang: ekstrak jadi komponen/fungsi bersama (mis. `ChartSvg`, `BarChartShell`,
+  `FormModal`), jangan copy-paste.
+
 
 ## Dokumentasi PKL
 

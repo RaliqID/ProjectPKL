@@ -26,6 +26,11 @@ use Carbon\CarbonImmutable;
  * service is intentionally read-only and month-bucketed: an operational
  * dashboard needs "is this getting better or worse", which means a stable
  * x-axis rather than an ad-hoc range.
+ *
+ * Kept as one file on purpose: all fourteen series share the same shape
+ * (buckets in, aligned arrays out) and are read together when the dashboard
+ * changes. Splitting them would scatter one concept.
+ * aislop-ignore-next-line complexity/file-too-large -- one cohesive concept; every series shares the bucket contract
  */
 class AnalyticsService
 {
@@ -308,10 +313,6 @@ class AnalyticsService
             ->map(fn ($v) => (int) $v)
             ->all();
     }
-
-    // ---------------------------------------------------------------------
-    // Module-specific series (Invoice, Payment, Archive, Expense, Procurement)
-    // ---------------------------------------------------------------------
 
     /**
      * Invoices issued / paid / overdue per month, plus their value.

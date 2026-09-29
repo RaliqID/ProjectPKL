@@ -436,8 +436,6 @@ class OperationsSeeder extends Seeder
         return $pdf;
     }
 
-    // ---- scenario builders ----
-
     private function baseTransaction(Customer $customer, User $operator, string $suffix, int $subtotal, int $daysAgo): Transaction
     {
         $date = now()->subDays($daysAgo)->startOfDay()->addHours(9);
@@ -649,8 +647,6 @@ class OperationsSeeder extends Seeder
         $trx->forceFill(['status' => TransactionStatus::AWAITING_PAYMENT])->save();
         $this->logCreation($trx, $operator, $trx->transaction_date);
     }
-
-    // ---- helpers ----
 
     private function syncDerivedStatus(Transaction $transaction, TransactionStatus $target): void
     {

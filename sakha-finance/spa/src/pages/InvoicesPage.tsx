@@ -86,8 +86,8 @@ export function InvoicesPage() {
       if (status) qs.set('status', status)
       await downloadFile(`/api/reports/invoices/export${qs.toString() ? `?${qs}` : ''}`, 'invoice.csv')
       toast.success('Laporan diunduh.')
-    } catch {
-      toast.error('Gagal mengunduh laporan.')
+    } catch (err) {
+      toast.error('Gagal mengunduh laporan.', err instanceof Error ? err.message : undefined)
     } finally {
       setExporting(false)
     }
@@ -100,8 +100,8 @@ export function InvoicesPage() {
       if (status) qs.set('status', status)
       await downloadFile(`/api/reports/invoices/pdf${qs.toString() ? `?${qs}` : ''}`, 'laporan-invoice.pdf')
       toast.success('Laporan PDF diunduh.')
-    } catch {
-      toast.error('Gagal mengunduh PDF.')
+    } catch (err) {
+      toast.error('Gagal mengunduh PDF.', err instanceof Error ? err.message : undefined)
     } finally {
       setPdfLoading(false)
     }
@@ -112,8 +112,8 @@ export function InvoicesPage() {
     try {
       const res = await api.post<{ message: string }>('/api/reports/email', { type: 'invoices' })
       toast.success(res.message)
-    } catch {
-      toast.error('Gagal mengirim laporan.')
+    } catch (err) {
+      toast.error('Gagal mengirim laporan.', err instanceof Error ? err.message : undefined)
     } finally {
       setEmailing(false)
     }

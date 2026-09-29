@@ -5,12 +5,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * Pengadaan barang + SPB (lightweight).
- *
- * Represents "Update Pengadaan Barang" and "Buku SPB". This records items
- * purchased (usually from a marketplace/supplier) together with their tracking
- * reference, and doubles as the SPB register. It is deliberately not a
- * procurement ERP: no approval chains, no multi-level budgets.
+ * Pengadaan barang + SPB (lightweight). Records purchased items with their
+ * tracking reference and doubles as the SPB register; not a procurement ERP.
  */
 return new class extends Migration
 {

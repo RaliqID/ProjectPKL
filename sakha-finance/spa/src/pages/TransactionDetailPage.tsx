@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import type { ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import {
   ArrowLeft,
@@ -645,8 +646,6 @@ function DeliveryTab({ trx, canWrite, onAdd }: { trx: NonNullable<ReturnType<typ
   )
 }
 
-// ---- Modals ----
-
 function StatusModal({ open, onClose, trx, isAdmin }: { open: boolean; onClose: () => void; trx: NonNullable<ReturnType<typeof useTransaction>['data']>; isAdmin: boolean }) {
   const toast = useToast()
   const change = useChangeStatus()
@@ -718,6 +717,54 @@ function StatusModal({ open, onClose, trx, isAdmin }: { open: boolean; onClose: 
   )
 }
 
+/**
+ * Shared modal shell for the transaction create-forms.
+ *
+ * The footer (a "Batal" ghost button beside a primary submit) is identical
+ * across the invoice and payment dialogs; keeping it here means the two forms
+ * only describe their own fields.
+ */
+function FormModal({
+  open,
+  onClose,
+  title,
+  description,
+  submitLabel,
+  loading,
+  onSubmit,
+  children,
+}: {
+  open: boolean
+  onClose: () => void
+  title: string
+  description?: string
+  submitLabel: string
+  loading: boolean
+  onSubmit: () => void
+  children: ReactNode
+}) {
+  return (
+    <Modal
+      open={open}
+      onClose={onClose}
+      title={title}
+      description={description}
+      footer={
+        <>
+          <Button variant="ghost" onClick={onClose}>
+            Batal
+          </Button>
+          <Button variant="primary" loading={loading} onClick={onSubmit}>
+            {submitLabel}
+          </Button>
+        </>
+      }
+    >
+      <div className="space-y-4">{children}</div>
+    </Modal>
+  )
+}
+
 function InvoiceModal({ open, onClose, transactionId }: { open: boolean; onClose: () => void; transactionId: number }) {
   const toast = useToast()
   const create = useCreateInvoice()
@@ -746,33 +793,25 @@ function InvoiceModal({ open, onClose, transactionId }: { open: boolean; onClose
   }
 
   return (
-    <Modal
+    <FormModal
       open={open}
       onClose={onClose}
       title="Tambah Invoice"
-      footer={
-        <>
-          <Button variant="ghost" onClick={onClose}>
-            Batal
-          </Button>
-          <Button variant="primary" loading={create.isPending} onClick={submit}>
-            Simpan Invoice
-          </Button>
-        </>
-      }
+      description={undefined}
+      submitLabel="Simpan Invoice"
+      loading={create.isPending}
+      onSubmit={submit}
     >
-      <div className="space-y-4">
-        <TextInput label="Nomor invoice" required value={form.invoice_number} onChange={(e) => set('invoice_number', e.target.value)} error={errors.invoice_number} placeholder="INV-…" />
-        <div className="grid grid-cols-2 gap-4">
-          <TextInput label="Tanggal invoice" type="date" value={form.invoice_date} onChange={(e) => set('invoice_date', e.target.value)} error={errors.invoice_date} />
-          <TextInput label="Jatuh tempo" type="date" value={form.due_date} onChange={(e) => set('due_date', e.target.value)} error={errors.due_date} />
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <TextInput label="Nilai" type="number" min={0} required value={form.amount} onChange={(e) => set('amount', e.target.value)} error={errors.amount} />
-          <TextInput label="Nilai pajak" type="number" min={0} value={form.tax_amount} onChange={(e) => set('tax_amount', e.target.value)} error={errors.tax_amount} />
-        </div>
+      <TextInput label="Nomor invoice" required value={form.invoice_number} onChange={(e) => set('invoice_number', e.target.value)} error={errors.invoice_number} placeholder="INV-…" />
+      <div className="grid grid-cols-2 gap-4">
+        <TextInput label="Tanggal invoice" type="date" value={form.invoice_date} onChange={(e) => set('invoice_date', e.target.value)} error={errors.invoice_date} />
+        <TextInput label="Jatuh tempo" type="date" value={form.due_date} onChange={(e) => set('due_date', e.target.value)} error={errors.due_date} />
       </div>
-    </Modal>
+      <div className="grid grid-cols-2 gap-4">
+        <TextInput label="Nilai" type="number" min={0} required value={form.amount} onChange={(e) => set('amount', e.target.value)} error={errors.amount} />
+        <TextInput label="Nilai pajak" type="number" min={0} value={form.tax_amount} onChange={(e) => set('tax_amount', e.target.value)} error={errors.tax_amount} />
+      </div>
+    </FormModal>
   )
 }
 
@@ -813,44 +852,35 @@ function PaymentModal({ open, onClose, trx }: { open: boolean; onClose: () => vo
   }
 
   return (
-    <Modal
+    <FormModal
       open={open}
       onClose={onClose}
       title="Catat Pembayaran"
       description={`Sisa tagihan: ${formatIDR(trx.financial.outstanding_amount)}`}
-      footer={
-        <>
-          <Button variant="ghost" onClick={onClose}>
-            Batal
-          </Button>
-          <Button variant="primary" loading={create.isPending} onClick={submit}>
-            Catat Pembayaran
-          </Button>
-        </>
-      }
+      submitLabel="Catat Pembayaran"
+      loading={create.isPending}
+      onSubmit={submit}
     >
-      <div className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <TextInput label="Nilai" type="number" min={0} required value={form.amount} onChange={(e) => set('amount', e.target.value)} error={errors.amount} />
-          <TextInput label="Tanggal pembayaran" type="date" required value={form.payment_date} onChange={(e) => set('payment_date', e.target.value)} error={errors.payment_date} />
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <Select label="Metode" options={PAYMENT_METHODS} value={form.method} onChange={(e) => set('method', e.target.value)} error={errors.method} />
-          <Select
-            label="Status"
-            options={[
-              { value: 'PENDING', label: 'Pending' },
-              { value: 'CONFIRMED', label: 'Dikonfirmasi' },
-            ]}
-            value={form.status}
-            onChange={(e) => set('status', e.target.value)}
-            error={errors.status}
-          />
-        </div>
-        <TextInput label="Referensi" value={form.payment_reference} onChange={(e) => set('payment_reference', e.target.value)} error={errors.payment_reference} placeholder="PAY-…" />
-        <Textarea label="Catatan" value={form.notes} onChange={(e) => set('notes', e.target.value)} />
+      <div className="grid grid-cols-2 gap-4">
+        <TextInput label="Nilai" type="number" min={0} required value={form.amount} onChange={(e) => set('amount', e.target.value)} error={errors.amount} />
+        <TextInput label="Tanggal pembayaran" type="date" required value={form.payment_date} onChange={(e) => set('payment_date', e.target.value)} error={errors.payment_date} />
       </div>
-    </Modal>
+      <div className="grid grid-cols-2 gap-4">
+        <Select label="Metode" options={PAYMENT_METHODS} value={form.method} onChange={(e) => set('method', e.target.value)} error={errors.method} />
+        <Select
+          label="Status"
+          options={[
+            { value: 'PENDING', label: 'Pending' },
+            { value: 'CONFIRMED', label: 'Dikonfirmasi' },
+          ]}
+          value={form.status}
+          onChange={(e) => set('status', e.target.value)}
+          error={errors.status}
+        />
+      </div>
+      <TextInput label="Referensi" value={form.payment_reference} onChange={(e) => set('payment_reference', e.target.value)} error={errors.payment_reference} placeholder="PAY-…" />
+      <Textarea label="Catatan" value={form.notes} onChange={(e) => set('notes', e.target.value)} />
+    </FormModal>
   )
 }
 

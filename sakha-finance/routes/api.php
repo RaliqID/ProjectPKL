@@ -127,22 +127,23 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
 
     // Reports
     Route::get('/reports', [ReportController::class, 'index']);
-    Route::get('/reports/transactions/export', [ReportController::class, 'exportTransactions']);
-    Route::get('/reports/invoices/export', [ReportController::class, 'exportInvoices']);
-    Route::get('/reports/archives/export', [ReportController::class, 'exportArchives']);
-    Route::get('/reports/expenses/export', [ReportController::class, 'exportExpenses']);
-    Route::get('/reports/procurements/export', [ReportController::class, 'exportProcurements']);
-    Route::get('/reports/ketelitian/export', [ReportController::class, 'exportKetelitian']);
-    Route::get('/reports/ketelitian/detail/export', [ReportController::class, 'exportKetelitianDetail']);
 
-    // Laporan PDF (server-side, dompdf)
-    Route::get('/reports/transactions/pdf', [ReportController::class, 'pdfTransactions']);
-    Route::get('/reports/invoices/pdf', [ReportController::class, 'pdfInvoices']);
-    Route::get('/reports/archives/pdf', [ReportController::class, 'pdfArchives']);
-    Route::get('/reports/expenses/pdf', [ReportController::class, 'pdfExpenses']);
-    Route::get('/reports/procurements/pdf', [ReportController::class, 'pdfProcurements']);
-    Route::get('/reports/ketelitian/pdf', [ReportController::class, 'pdfKetelitian']);
+    // One route per format, covering every report type via the {type} segment:
+    //   /api/reports/{type}/export  -> CSV
+    //   /api/reports/{type}/excel   -> XLSX (branded)
+    //   /api/reports/{type}/pdf     -> PDF (branded)
+    // {type}: transactions|invoices|archives|expenses|procurements|ketelitian
+    $reportTypes = 'transactions|invoices|archives|expenses|procurements|ketelitian';
+
+    Route::get('/reports/{type}/export', [ReportController::class, 'exportCsv'])->where('type', $reportTypes);
+    Route::get('/reports/{type}/excel', [ReportController::class, 'exportExcel'])->where('type', $reportTypes);
+    Route::get('/reports/{type}/pdf', [ReportController::class, 'pdfReport'])->where('type', $reportTypes);
+
     Route::post('/reports/email', [ReportController::class, 'emailReport']);
+
+    // Ketelitian detail export (per-check rows) stays separate: it is a
+    // different shape from the per-transaction summary.
+    Route::get('/reports/ketelitian/detail/export', [ReportController::class, 'exportKetelitianDetail']);
 
     // Users (ADMIN only — enforced in controller)
     Route::get('/users', [UserController::class, 'index']);

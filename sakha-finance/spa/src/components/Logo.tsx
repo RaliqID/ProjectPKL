@@ -32,7 +32,7 @@ interface LogoProps {
   withWordmark?: boolean
   /** Show the "Finance Operations" line under the wordmark. */
   withTagline?: boolean
-  /** If set, the whole logo is a link (used to return to the landing page). */
+  /** When provided, the whole logo becomes a link back to the landing page. */
   to?: string
   className?: string
 }

@@ -12,9 +12,7 @@ use Illuminate\Support\Str;
  */
 class UserFactory extends Factory
 {
-    /**
-     * The current password being used by the factory.
-     */
+    /** Cache of the hashed password, so hashing runs once per test run. */
     protected static ?string $password;
 
     /**
